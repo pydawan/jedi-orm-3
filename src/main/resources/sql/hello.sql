@@ -1,0 +1,3 @@
+USE jedi;
+
+SELECT 'HELLO';

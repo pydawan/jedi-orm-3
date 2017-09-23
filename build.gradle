@@ -1,0 +1,43 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+archivesBaseName = 'jedi-orm'
+group = 'jedi.db'
+version = 'v1.0.0'
+
+jar {
+   manifest {
+      attributes (
+         'Implementation-Title': 'Jedi ORM',
+         'Implementation-Version': version
+      )
+   }
+   // inclui o código-fonte no jar construído.
+   from sourceSets.main.allSource
+   // gera um fat-jar (jar com todas as classes do projeto e de suas dependências).
+   doFirst {
+      from {
+         configurations.runtime.collect {
+            it.isDirectory() ? it : zipTree(it)
+         }
+      }
+   }
+}
+
+repositories {
+   mavenLocal()
+   mavenCentral()
+}
+
+dependencies {
+   compile 'mysql:mysql-connector-java:5.1.31'
+   compile 'com.mchange:c3p0:0.9.5.2'
+   compile 'com.zaxxer:HikariCP:2.6.3'
+   compile files('./lib/jedi-app-1.0.jar')
+   testCompile 'junit:junit:4.12'
+}
+
+configurations.all { exclude module: 'slf4j-log4j12' }
