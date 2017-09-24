@@ -113,8 +113,13 @@ public abstract class JediEngine {
    
    public static final String WEBINF_CLASSES_JEDI_PROPERTIES = PROJECT_DIR + "WEB-INF/classes/jedi.properties";
    
-   public static final String[] JEDI_PROPERTIES_PATHS = { PROJECT_DIR_JEDI_PROPERTIES, SRC_MAIN_RESOURCES_JEDI_PROPERTIES,
-      SRC_TEST_RESOURCES_JEDI_PROPERTIES, SRC_MAIN_WEBAPP_WEBINF_JEDI_PROPERTIES, WEBINF_CLASSES_JEDI_PROPERTIES };
+   public static final String[] JEDI_PROPERTIES_PATHS = {
+      PROJECT_DIR_JEDI_PROPERTIES, 
+      SRC_MAIN_RESOURCES_JEDI_PROPERTIES,
+      SRC_TEST_RESOURCES_JEDI_PROPERTIES, 
+      SRC_MAIN_WEBAPP_WEBINF_JEDI_PROPERTIES, 
+      WEBINF_CLASSES_JEDI_PROPERTIES
+   };
    // Application's root directory.
    // public static String APP_ROOT_DIR = System.getProperty("user.dir");
    public static String APP_ROOT_DIR = JediEngine.class
@@ -129,10 +134,15 @@ public abstract class JediEngine {
    public static String APP_SRC_DIR = APP_ROOT_DIR + "/src";
    public static String APP_LIBS_DIR = APP_ROOT_DIR + "/lib";
    public static String JEDI_PROPERTIES_PATH = null;
-   public static final String[] JEDI_PROPERTIES_LIKELY_PATHS = { JEDI_PROPERTIES_PATH, APP_SRC_DIR + "/jedi.properties",
-      APP_ROOT_DIR + "/WEB-INF/classes/jedi.properties", APP_ROOT_DIR + "/WebContent/WEB-INF/jedi.properties",
-      APP_ROOT_DIR + "/web/WEB-INF/jedi.properties", APP_SRC_DIR + "/main/resources/jedi.properties",
-      APP_SRC_DIR + "/main/webapp/WEB-INF/jedi.properties", APP_SRC_DIR + "/test/resources/jedi.properties" };
+   public static final String[] JEDI_PROPERTIES_LIKELY_PATHS = { 
+      JEDI_PROPERTIES_PATH, APP_SRC_DIR + "/jedi.properties",
+      APP_ROOT_DIR + "/WEB-INF/classes/jedi.properties", 
+      APP_ROOT_DIR + "/WebContent/WEB-INF/jedi.properties",
+      APP_ROOT_DIR + "/web/WEB-INF/jedi.properties", 
+      APP_SRC_DIR + "/main/resources/jedi.properties",
+      APP_SRC_DIR + "/main/webapp/WEB-INF/jedi.properties", 
+      APP_SRC_DIR + "/test/resources/jedi.properties"
+   };
    public static String TABLE = "";
    public static boolean DATABASE_ENVIRONMENTS = false;
    public static String DATABASE_ENVIRONMENTS_DEVELOPMENT = "development";
@@ -208,9 +218,23 @@ public abstract class JediEngine {
    public static Map<String, List<String>> APP_SQL = new HashMap();
    public static FileInputStream JEDI_PROPERTIES_FILE;
    public static Properties JEDI_PROPERTIES;
-   public static final Class[] JEDI_FIELD_ANNOTATION_CLASSES = { CharField.class, EmailField.class, URLField.class, IPAddressField.class,
-      TextField.class, IntegerField.class, DecimalField.class, FloatField.class, BooleanField.class, DateField.class, TimeField.class,
-      DateTimeField.class, OneToOneField.class, ForeignKeyField.class, ManyToManyField.class };
+   public static final Class[] JEDI_FIELD_ANNOTATION_CLASSES = {
+      CharField.class, 
+      EmailField.class, 
+      URLField.class, 
+      IPAddressField.class,
+      TextField.class, 
+      IntegerField.class, 
+      DecimalField.class, 
+      FloatField.class, 
+      BooleanField.class, 
+      DateField.class, 
+      TimeField.class,
+      DateTimeField.class, 
+      OneToOneField.class, 
+      ForeignKeyField.class, 
+      ManyToManyField.class
+   };
    private static Manager SQLManager;
    private static Integer MYSQL_VERSION = null;
    
