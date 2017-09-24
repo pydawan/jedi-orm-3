@@ -33,14 +33,14 @@ import jedi.db.util.TableUtil;
  */
 @SuppressWarnings({ "rawtypes", "unused", "unchecked", "deprecation" })
 public class Model implements IModel {
+
+   private static final long serialVersionUID = 1L;
    
    public static final List<?> NULL_LIST = null;
    public static final QuerySet<? extends Model> NULL_QUERYSET = null;
    
    public static final List<?> EMPTY_LIST = new ArrayList<>(0);
    public static final QuerySet<? extends Model> EMPTY_QUERYSET = new QuerySet<>(0);
-   
-   private static final long serialVersionUID = 1L;
    
    private transient Connection connection;
    private transient boolean autoCloseConnection = AUTO_CLOSE.isValue();
