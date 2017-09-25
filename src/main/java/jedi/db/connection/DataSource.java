@@ -19,6 +19,7 @@ import static jedi.db.engine.JediEngine.DATABASE_NAME;
 import static jedi.db.engine.JediEngine.DATABASE_PASSWORD;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_ENGINE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HAKIRI_MIN_SIZE;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_ALLOW_POOL_SUSPENSION;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_AUTO_RECONNECT;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CACHE_PREPARED_STATEMENTS;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CACHE_RESULTSET_METADATA;
@@ -27,6 +28,7 @@ import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CHECKOUT_TIMEOUT;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CONNECTION_TIMEOUT;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_ELIDE_SET_AUTO_COMMITS;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_IDLE_TIMEOUT;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_ISOLATE_INTERNAL_QUERIES;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_LEAK_DETECTION;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_MAX_LIFETIME;
@@ -34,6 +36,8 @@ import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_MAX_SIZE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_MINIMUM_IDLE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SIZE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SQL_LIMIT;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_READ_ONLY;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_REGISTER_MBEANS;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_REWRITE_BATCHED_STAMENTS;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_USE_LOCAL_SESSION_STATE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_USE_LOCAL_TRANSACTION_STATE;
@@ -60,8 +64,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import jedi.db.engine.JediEngine;
 
 /**
- * @author thiago
+ * @author thiago-amm
  * @version v1.0.0 19/03/2017
+ * @version v1.0.1 25/09/2017
  * @since v1.0.0
  */
 public class DataSource {
@@ -224,14 +229,17 @@ public class DataSource {
                hikari.setLeakDetectionThreshold(DATABASE_POOL_HIKARI_LEAK_DETECTION); // default: 0 (disabled)
                hikari.setValidationTimeout(DATABASE_POOL_HIKARI_VALIDATION_TIMEOUT); // default: 5000
                hikari.addDataSourceProperty("autoReconnect", DATABASE_POOL_HIKARI_AUTO_RECONNECT);
-               hikari.addDataSourceProperty("useLocalSessionState", DATABASE_POOL_HIKARI_USE_LOCAL_SESSION_STATE);
-               hikari.addDataSourceProperty("useLocalTransactionState", DATABASE_POOL_HIKARI_USE_LOCAL_TRANSACTION_STATE);
-               hikari.addDataSourceProperty("rewriteBatchedStatements", DATABASE_POOL_HIKARI_REWRITE_BATCHED_STAMENTS);
-               hikari.addDataSourceProperty("cacheResultSetMetadata", DATABASE_POOL_HIKARI_CACHE_RESULTSET_METADATA);
-               hikari.addDataSourceProperty("cacheServerConfiguration", DATABASE_POOL_HIKARI_CACHE_SERVER_CONFIGURATION);
-               hikari.addDataSourceProperty("elideSetAutoCommits", DATABASE_POOL_HIKARI_ELIDE_SET_AUTO_COMMITS);
-               hikari.addDataSourceProperty("maintainTimeStats", DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS);
-               
+               hikari.addDataSourceProperty("useLocalSessionState", DATABASE_POOL_HIKARI_USE_LOCAL_SESSION_STATE); // default :false
+               hikari.addDataSourceProperty("useLocalTransactionState", DATABASE_POOL_HIKARI_USE_LOCAL_TRANSACTION_STATE); // default: false
+               hikari.addDataSourceProperty("rewriteBatchedStatements", DATABASE_POOL_HIKARI_REWRITE_BATCHED_STAMENTS); // default: false
+               hikari.addDataSourceProperty("cacheResultSetMetadata", DATABASE_POOL_HIKARI_CACHE_RESULTSET_METADATA); // default: false
+               hikari.addDataSourceProperty("cacheServerConfiguration", DATABASE_POOL_HIKARI_CACHE_SERVER_CONFIGURATION); // default: false
+               hikari.addDataSourceProperty("elideSetAutoCommits", DATABASE_POOL_HIKARI_ELIDE_SET_AUTO_COMMITS); // default: false
+               hikari.addDataSourceProperty("maintainTimeStats", DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS); // default: false
+               hikari.addDataSourceProperty("isolateInternalQueries", DATABASE_POOL_HIKARI_ISOLATE_INTERNAL_QUERIES); // default: false
+               hikari.addDataSourceProperty("allowPoolSuspension", DATABASE_POOL_HIKARI_ALLOW_POOL_SUSPENSION); // default: false
+               hikari.addDataSourceProperty("readOnly", DATABASE_POOL_HIKARI_READ_ONLY); // default: false
+               hikari.addDataSourceProperty("registerMbeans", DATABASE_POOL_HIKARI_REGISTER_MBEANS); // default: false
 //               hikari.setConnectionInitSql(DATABASE_POOL_CONNECTION_TEST_QUERY); // default: none
 //               hikari.addDataSourceProperty("jdbc4ConnectionTest", DATABASE_POOL_CONNECTION_TEST);
 //               hikari.setConnectionTestQuery(DATABASE_POOL_CONNECTION_TEST_QUERY);

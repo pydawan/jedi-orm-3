@@ -73,8 +73,10 @@ import jedi.generator.CodeGenerator;
  * <strong>Jedi's Object-Relational Mapping Engine.</strong>
  * </p>
  *
- * @author thiago
+ * @author thiago-amm
+ * @version v1.0.0
  * @version v1.0.1 19/01/2017
+ * @version v1.0.2 25/09/2017
  * @since v1.0.0
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -184,6 +186,20 @@ public abstract class JediEngine {
    public static boolean DATABASE_POOL_HIKARI_CACHE_SERVER_CONFIGURATION = false;
    public static boolean DATABASE_POOL_HIKARI_ELIDE_SET_AUTO_COMMITS = false;
    public static boolean DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS = false;
+   public static boolean DATABASE_POOL_HIKARI_ISOLATE_INTERNAL_QUERIES = false;
+   public static boolean DATABASE_POOL_HIKARI_ALLOW_POOL_SUSPENSION = false;
+   public static boolean DATABASE_POOL_HIKARI_READ_ONLY = false;
+   public static boolean DATABASE_POOL_HIKARI_REGISTER_MBEANS = false;
+   
+   // TODO - MAPEAR COMO PROPRIEDADES NO ARQUIVO jedi.properties.
+   public static boolean DATABASE_POOL_HIKARI_TRANSACTION_ISOLATION = false;
+   public static boolean DATABASE_POOL_HIKARI_DATASOURCE = false;
+   public static boolean DATABASE_POOL_HIKARI_DATASOURCE_CLASS_NAME = false;
+   public static boolean DATABASE_POOL_HIKARI_SCHEMA = false;
+   public static boolean DATABASE_POOL_HIKARI_THREAD_FACTORY = false;
+   public static boolean DATABASE_POOL_HIKARI_SCHEDULED_EXECUTOR = false;
+   public static boolean DATABASE_POOL_HIKARI_JDBC_URL = false;
+   
    public static Boolean DATABASE_USE_SSL;
    public static Boolean DATABASE_VERIFY_SERVER_CERTIFICATE;
    public static Boolean DATABASE_AUTO_RECONNECT;
@@ -202,6 +218,7 @@ public abstract class JediEngine {
    public static Integer DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SIZE = 500;
    public static Integer DATABASE_POOL_HIKARI_CHECKOUT_TIMEOUT = 10;
    public static Integer DATABASE_POOL_HIKARI_CONNECTION_TIMEOUT = 30000;
+   public static Integer DATABASE_POOL_HIKARI_INITIALIZE_FAIL_TIMEOUT = 1;
 //   public static Integer DATABASE_MAX_IDLE_TIME = 600000;
    public static Integer DATABASE_POOL_HIKARI_MINIMUM_IDLE = DATABASE_POOL_HIKARI_MAX_SIZE;
    public static Integer DATABASE_POOL_HIKARI_IDLE_TIMEOUT = 600000;
@@ -1697,9 +1714,44 @@ public abstract class JediEngine {
             } else if (
                   key.equals("pool.maintain.timestats") ||
                   key.equals("db.pool.maintain.timestats") ||
-                  key.equals("database.pool.maintain.timestats")) {
+                  key.equals("database.pool.maintain.timestats") ||
+                  key.equals("pool.maintain.time.statistics") ||
+                  key.equals("db.pool.maintain.time.statistics") ||
+                  key.equals("database.pool.maintain.time.statistics")) {
                   DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS = Boolean.parseBoolean(value);
             } else if (
+                  key.equals("pool.initialize.fail.timeout") ||
+                  key.equals("db.pool.initialize.fail.timeout") ||
+                  key.equals("database.pool.initialize.fail.timeout") ||
+                  key.equals("pool.ini.fail.timeout") ||
+                  key.equals("db.pool.ini.fail.timeout") ||
+                  key.equals("database.pool.ini.fail.timeout")) {
+                  DATABASE_POOL_HIKARI_INITIALIZE_FAIL_TIMEOUT = Integer.parseInt(value);
+            } else if (
+                  key.equals("pool.isolate.internal.queries") ||
+                  key.equals("db.pool.isolate.internal.queries") ||
+                  key.equals("database.pool.isolate.internal.queries") ||
+                  key.equals("pool.queries.internal.isolate") ||
+                  key.equals("db.pool.queries.internal.isolate") ||
+                  key.equals("database.pool.queries.internal.isolate")) {
+                  DATABASE_POOL_HIKARI_ISOLATE_INTERNAL_QUERIES = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.suspension.allow") ||
+                  key.equals("db.pool.suspension.allow") ||
+                  key.equals("database.pool.suspension.allow")) {
+                  DATABASE_POOL_HIKARI_ALLOW_POOL_SUSPENSION = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.readonly") ||
+                  key.equals("db.pool.readonly") ||
+                  key.equals("database.pool.readonly")) {
+                  DATABASE_POOL_HIKARI_READ_ONLY = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.mbeans.register") ||
+                  key.equals("db.pool.mbeans.register") ||
+                  key.equals("database.pool.mbeans.register")) {
+                  DATABASE_POOL_HIKARI_REGISTER_MBEANS = Boolean.parseBoolean(value);
+            }
+            else if (
                   key.equals("foreignkey.checks") ||
                   key.equals("db.foreignkey.checks") ||
                   key.equals("database.foreignkey.checks") ||
