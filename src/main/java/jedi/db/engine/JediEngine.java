@@ -177,6 +177,13 @@ public abstract class JediEngine {
    public static boolean DATABASE_POOL_HIKARI_USE_SERVER_PREPARED_STATEMENTS = false;
    public static boolean DATABASE_POOL_HIKARI_AUTO_RECONNECT = true;
    public static boolean DATABASE_POOL_HIKARI_CONNECTION_TEST = true;
+   public static boolean DATABASE_POOL_HIKARI_USE_LOCAL_SESSION_STATE = false;
+   public static boolean DATABASE_POOL_HIKARI_USE_LOCAL_TRANSACTION_STATE = false;
+   public static boolean DATABASE_POOL_HIKARI_REWRITE_BATCHED_STAMENTS = false;
+   public static boolean DATABASE_POOL_HIKARI_CACHE_RESULTSET_METADATA = false;
+   public static boolean DATABASE_POOL_HIKARI_CACHE_SERVER_CONFIGURATION = false;
+   public static boolean DATABASE_POOL_HIKARI_ELIDE_SET_AUTO_COMMITS = false;
+   public static boolean DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS = false;
    public static Boolean DATABASE_USE_SSL;
    public static Boolean DATABASE_VERIFY_SERVER_CERTIFICATE;
    public static Boolean DATABASE_AUTO_RECONNECT;
@@ -205,17 +212,17 @@ public abstract class JediEngine {
    public static String DATABASE_POOL_HIKARI_CONNECTION_TEST_QUERY = "SELECT 1 FROM DUAL";
    public static FetchType FETCH_TYPE = FetchType.EAGER;
    public static CascadeType CASCADE_TYPE = CascadeType.ALL;
-   public static List<String> INSTALLED_APPS = new ArrayList();
+   public static List<String> INSTALLED_APPS = new ArrayList<>();
    // List of maps with table names and models.
-   public static List<String> SQL_ASSOCIATION_TABLES = new ArrayList();
+   public static List<String> SQL_ASSOCIATION_TABLES = new ArrayList<>();
    public static List<String> SQL_CREATE_TABLES;
    public static Map<String, String> CREATE_TABLES;
-   public static Map<String, List<String>> SQL_FOREIGN_KEYS = new HashMap();
-   public static Map<String, List<String>> SQL_INDEXES = new HashMap();
-   public static Map<String, List<String>> MYSQL_AUTO_NOW = new HashMap();
-   public static Map<String, List<String>> MYSQL_AUTO_NOW_ADD = new HashMap();
-   public static Map<String, List<String>> SQL_COMMENTS = new HashMap();
-   public static Map<String, List<String>> APP_SQL = new HashMap();
+   public static Map<String, List<String>> SQL_FOREIGN_KEYS = new HashMap<>();
+   public static Map<String, List<String>> SQL_INDEXES = new HashMap<>();
+   public static Map<String, List<String>> MYSQL_AUTO_NOW = new HashMap<>();
+   public static Map<String, List<String>> MYSQL_AUTO_NOW_ADD = new HashMap<>();
+   public static Map<String, List<String>> SQL_COMMENTS = new HashMap<>();
+   public static Map<String, List<String>> APP_SQL = new HashMap<>();
    public static FileInputStream JEDI_PROPERTIES_FILE;
    public static Properties JEDI_PROPERTIES;
    public static final Class[] JEDI_FIELD_ANNOTATION_CLASSES = {
@@ -246,9 +253,9 @@ public abstract class JediEngine {
    // Framework's model directory.
    public static final String JEDI_DB_MODELS = "jedi/db/models";
    // Application's models that were read and that will be mapped in tables.
-   public static List<String> READED_APP_MODELS = new ArrayList();
+   public static List<String> READED_APP_MODELS = new ArrayList<>();
    // Generated tables.
-   public static List<String> GENERATED_TABLES = new ArrayList();
+   public static List<String> GENERATED_TABLES = new ArrayList<>();
    
    public static boolean isWindows() {
       boolean isWindows = false;
@@ -344,8 +351,8 @@ public abstract class JediEngine {
     *           PATH do sistema de arquivos
     */
    public static void syncdb(String path) {
-      CREATE_TABLES = new HashMap();
-      SQL_CREATE_TABLES = new ArrayList();
+      CREATE_TABLES = new HashMap<>();
+      SQL_CREATE_TABLES = new ArrayList<>();
       MYSQL_VERSION = JediEngine.getMySQLVersion();
       getSQLOfInstalledApps();
       // Get SQL from Jedi Models
@@ -398,8 +405,8 @@ public abstract class JediEngine {
     */
    public static void sqlall(File file) {
       String path = file == null ? "" : file.getAbsolutePath();
-      CREATE_TABLES = new HashMap();
-      SQL_CREATE_TABLES = new ArrayList();
+      CREATE_TABLES = new HashMap<>();
+      SQL_CREATE_TABLES = new ArrayList<>();
       getSQLOfInstalledApps();
       getSQL(path);
       System.out.println();
@@ -444,8 +451,8 @@ public abstract class JediEngine {
    }
    
    public static void sqlall(String app) {
-      CREATE_TABLES = new HashMap();
-      SQL_CREATE_TABLES = new ArrayList();
+      CREATE_TABLES = new HashMap<>();
+      SQL_CREATE_TABLES = new ArrayList<>();
       getSQLOfInstalledApp(app);
       System.out.println();
       System.out.println("BEGIN;\n");
@@ -481,8 +488,8 @@ public abstract class JediEngine {
    }
    
    public static void sql(String app) {
-      CREATE_TABLES = new HashMap();
-      SQL_CREATE_TABLES = new ArrayList();
+      CREATE_TABLES = new HashMap<>();
+      SQL_CREATE_TABLES = new ArrayList<>();
       getSQLOfInstalledApp(app);
       System.out.println("BEGIN;\n");
       if (!SQL_CREATE_TABLES.isEmpty()) {
@@ -496,8 +503,8 @@ public abstract class JediEngine {
    }
    
    public static void sql() {
-      CREATE_TABLES = new HashMap();
-      SQL_CREATE_TABLES = new ArrayList();
+      CREATE_TABLES = new HashMap<>();
+      SQL_CREATE_TABLES = new ArrayList<>();
       getSQLOfInstalledApps();
       getSQL(JediEngine.APP_SRC_DIR);
       System.out.println("BEGIN;\n");
@@ -1364,6 +1371,16 @@ public abstract class JediEngine {
                   key.equals("database.pool.commit")) {
                AUTO_COMMIT = value.equals("auto") ? AutoCommit.YES : AutoCommit.NO;
             } else if (
+                  key.equals("pool.autocommit") ||
+                  key.equals("db.pool.autocommit") ||
+                  key.equals("database.pool.autocommit")) {
+                  boolean autoCommit = Boolean.parseBoolean(value);
+                  if (autoCommit) {
+                     AUTO_COMMIT = AutoCommit.YES;
+                  } else {
+                     AUTO_COMMIT = AutoCommit.NO;
+                  }
+            } else if (
                   key.equals("pool.close.auto") || 
                   key.equals("db.pool.close.auto") || 
                   key.equals("database.pool.close.auto")) {
@@ -1373,6 +1390,16 @@ public abstract class JediEngine {
                   key.equals("db.pool.close") || 
                   key.equals("database.pool.close")) {
                AUTO_CLOSE = value.equals("auto") ? AutoClose.YES : AutoClose.NO;
+            } else if (
+                  key.equals("pool.autoclose") ||
+                  key.equals("db.pool.autoclose") ||
+                  key.equals("database.pool.autoclose")) {
+                  boolean autoClose = Boolean.parseBoolean(value);
+                  if (autoClose) {
+                     AUTO_CLOSE = AutoClose.YES;
+                  } else {
+                     AUTO_CLOSE = AutoClose.NO;
+                  }
             } else if (
                   key.equals("pool") || 
                   key.equals("db.pool") || 
@@ -1407,8 +1434,8 @@ public abstract class JediEngine {
                DATABASE_ACQUIRE_INCREMENT = Integer.parseInt(value);
             } else if (
                   key.equals("pool.ini") ||
-                  key.equals("pool.size.ini") ||
                   key.equals("pool.initial") ||
+                  key.equals("pool.size.ini") ||
                   key.equals("pool.size.initial") ||
                   key.equals("db.pool.ini") ||
                   key.equals("db.pool.initial") ||
@@ -1421,11 +1448,17 @@ public abstract class JediEngine {
                DATABASE_INITIAL_POOL_SIZE = Integer.parseInt(value);
             } else if (
                   key.equals("pool.max") ||
-                  key.equals("pool.size.maximum") ||
+                  key.equals("pool.maximum") ||
                   key.equals("db.pool.max") ||
-                  key.equals("db.pool.size.maximum") ||
+                  key.equals("db.pool.maximum") ||
                   key.equals("database.pool.max") ||
-                  key.equals("database.pool.maximum")) {
+                  key.equals("database.pool.maximum") ||
+                  key.equals("pool.size.max") ||
+                  key.equals("pool.size.maximum") ||
+                  key.equals("db.pool.size.max") ||
+                  key.equals("db.pool.size.maximum") ||
+                  key.equals("database.pool.size.max") ||
+                  key.equals("database.pool.size.maximum")) {
                DATABASE_MAX_POOL_SIZE = Integer.parseInt(value);
                DATABASE_POOL_HIKARI_MAX_SIZE = Integer.parseInt(value);
             } else if (
@@ -1434,7 +1467,13 @@ public abstract class JediEngine {
                   key.equals("db.pool.min") ||
                   key.equals("db.pool.minimum") ||
                   key.equals("database.pool.min") ||
-                  key.equals("database.pool.minimum")) {
+                  key.equals("database.pool.minimum") ||
+                  key.equals("pool.size.min") ||
+                  key.equals("pool.size.minimum") ||
+                  key.equals("db.pool.size.min") ||
+                  key.equals("db.pool.size.minimum") ||
+                  key.equals("database.pool.size.min") ||
+                  key.equals("database.pool.size.minimum")) {
                DATABASE_MIN_POOL_SIZE = Integer.parseInt(value);
                DATABASE_POOL_HAKIRI_MIN_SIZE = Integer.parseInt(value);
             } else if (
@@ -1613,6 +1652,53 @@ public abstract class JediEngine {
                   key.equals("db.pool.leak") ||
                   key.equals("database.pool.leak")) {
                DATABASE_POOL_HIKARI_LEAK_DETECTION = Integer.parseInt(value);
+            } else if (
+                  key.equals("pool.session.state.local") ||
+                  key.equals("db.pool.session.state.local") ||
+                  key.equals("database.pool.session.state.local") ||
+                  key.equals("pool.sessionState.local") ||
+                  key.equals("db.pool.sessionState.local") ||
+                  key.equals("database.pool.sessionState.local")) {
+                  DATABASE_POOL_HIKARI_USE_LOCAL_SESSION_STATE = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.transaction.state.local") ||
+                  key.equals("db.pool.transaction.state.local") ||
+                  key.equals("database.pool.transaction.state.local") ||
+                  key.equals("pool.transactionState.local") ||
+                  key.equals("db.pool.transactionState.local") ||
+                  key.equals("database.pool.transactionState.local")) {
+                  DATABASE_POOL_HIKARI_USE_LOCAL_TRANSACTION_STATE = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.statements.batch.rewrite") ||
+                  key.equals("db.pool.statements.batch.rewrite") ||
+                  key.equals("database.pool.statements.batch.rewrite") ||
+                  key.equals("pool.batchStatements.rewrite") ||
+                  key.equals("db.pool.batchStatements.rewrite") ||
+                  key.equals("database.pool.batchStatements.rewrite") ||
+                  key.equals("pool.batch.rewrite") ||
+                  key.equals("db.pool.batch.rewrite") ||
+                  key.equals("database.pool.batch.rewrite")) {
+                  DATABASE_POOL_HIKARI_REWRITE_BATCHED_STAMENTS = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.cache.resultset.metadata") ||
+                  key.equals("db.pool.cache.resultset.metadata") ||
+                  key.equals("database.pool.cache.resultset.metadata")) {
+                  DATABASE_POOL_HIKARI_CACHE_RESULTSET_METADATA = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.cache.server.configuration") ||
+                  key.equals("db.pool.cache.server.configuration") ||
+                  key.equals("database.pool.cache.server.configuration")) {
+                  DATABASE_POOL_HIKARI_CACHE_SERVER_CONFIGURATION = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.elide.set.autocommits") ||
+                  key.equals("db.pool.elide.set.autocommits") ||
+                  key.equals("database.pool.elide.set.autocommits")) {
+                  DATABASE_POOL_HIKARI_ELIDE_SET_AUTO_COMMITS = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("pool.maintain.timestats") ||
+                  key.equals("db.pool.maintain.timestats") ||
+                  key.equals("database.pool.maintain.timestats")) {
+                  DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS = Boolean.parseBoolean(value);
             } else if (
                   key.equals("foreignkey.checks") ||
                   key.equals("db.foreignkey.checks") ||
@@ -1850,7 +1936,7 @@ public abstract class JediEngine {
    }
    
    public static List<Field> getFields(Class<? extends jedi.db.models.Model> c, Class a) {
-      List<Field> fields = new ArrayList();
+      List<Field> fields = new ArrayList<>();
       if (c != null) {
          try {
             if (!isJediFieldAnnotation(a)) {
@@ -1872,7 +1958,7 @@ public abstract class JediEngine {
    }
    
    public static List<Field> getFields(Class<? extends jedi.db.models.Model> c) {
-      List<Field> fields = new ArrayList();
+      List<Field> fields = new ArrayList<>();
       if (isJediModel(c)) {
          for (Field field : getAllFields(c)) {
             if (isJediField(field)) {
@@ -1998,7 +2084,7 @@ public abstract class JediEngine {
                DATABASE_ENGINE.equals("mysql") && !comment.isEmpty() ? String.format(" COMMENT '%s'", comment) : "");
             if (DATABASE_ENGINE.equals("postgresql") || DATABASE_ENGINE.equals("oracle")) {
                String tableName = TableUtil.getTableName(field.getDeclaringClass());
-               List<String> comments = new ArrayList();
+               List<String> comments = new ArrayList<>();
                comment = String.format("COMMENT ON COLUMN %s.%s IS '%s';\n\n", tableName, TableUtil.getColumnName(field), comment);
                comments.add(comment);
                SQL_COMMENTS.put(tableName, comments);
@@ -2553,7 +2639,7 @@ public abstract class JediEngine {
    }
    
    public static Map<String, Object> getManyToManyFieldSQL(Field field) {
-      Map<String, Object> sqls = new HashMap();
+      Map<String, Object> sqls = new HashMap<>();
       if (field != null && Model.class.isAssignableFrom(field.getDeclaringClass())) {
          ManyToManyField manyToManyFieldAnnotation = field.getAnnotation(ManyToManyField.class);
          if (manyToManyFieldAnnotation != null) {
@@ -2663,7 +2749,7 @@ public abstract class JediEngine {
                   onDeleteString,
                   onUpdateString);
                List<String> fks = SQL_FOREIGN_KEYS.get(modelClass.toString());
-               List<String> foreignKeys = new ArrayList();
+               List<String> foreignKeys = new ArrayList<>();
                if (!fks.contains(fk)) {
                   fks.add(fk);
                   foreignKeys.add(fk);
@@ -2678,7 +2764,7 @@ public abstract class JediEngine {
                   TableUtil.getColumnName(references),
                   TableUtil.getColumnName(modelName));
                List<String> ixs = SQL_INDEXES.get(modelClass.toString());
-               List<String> indexes = new ArrayList();
+               List<String> indexes = new ArrayList<>();
                if (!ixs.contains(ix)) {
                   ixs.add(ix);
                   indexes.add(ix);
@@ -2924,7 +3010,7 @@ public abstract class JediEngine {
     * @return
     */
    public static List<String> listSQL(Class<? extends jedi.db.models.Model> c, Class a) {
-      List<String> l = new ArrayList();
+      List<String> l = new ArrayList<>();
       if (isJediModel(c) && isJediFieldAnnotation(a)) {
          for (Field f : c.getDeclaredFields()) {
             if (isJediField(f)) {
@@ -2936,7 +3022,7 @@ public abstract class JediEngine {
    }
    
    public static List<String> listSQL(Class<? extends jedi.db.models.Model> c) {
-      List<String> l = new ArrayList();
+      List<String> l = new ArrayList<>();
       if (isJediModel(c)) {
          for (Field f : c.getDeclaredFields()) {
             if (isJediField(f)) {
@@ -2948,7 +3034,7 @@ public abstract class JediEngine {
    }
    
    public static Map<Field, String> mapSQL(Class<? extends jedi.db.models.Model> c, Class a) {
-      Map<Field, String> m = new HashMap();
+      Map<Field, String> m = new HashMap<>();
       if (isJediModel(c) && isJediFieldAnnotation(a)) {
          for (Field f : c.getDeclaredFields()) {
             if (f.getAnnotation(a) != null) {
@@ -2960,7 +3046,7 @@ public abstract class JediEngine {
    }
    
    public static Map<Field, String> mapSQL(Class<? extends jedi.db.models.Model> c) {
-      Map<Field, String> m = new HashMap();
+      Map<Field, String> m = new HashMap<>();
       if (isJediModel(c)) {
          for (Field f : c.getDeclaredFields()) {
             if (isJediField(f)) {

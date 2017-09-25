@@ -21,15 +21,22 @@ import static jedi.db.engine.JediEngine.DATABASE_POOL_ENGINE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HAKIRI_MIN_SIZE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_AUTO_RECONNECT;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CACHE_PREPARED_STATEMENTS;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CACHE_RESULTSET_METADATA;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CACHE_SERVER_CONFIGURATION;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CHECKOUT_TIMEOUT;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_CONNECTION_TIMEOUT;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_ELIDE_SET_AUTO_COMMITS;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_IDLE_TIMEOUT;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_LEAK_DETECTION;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_MAX_LIFETIME;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_MAX_SIZE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_MINIMUM_IDLE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SIZE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SQL_LIMIT;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_REWRITE_BATCHED_STAMENTS;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_USE_LOCAL_SESSION_STATE;
+import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_USE_LOCAL_TRANSACTION_STATE;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_USE_SERVER_PREPARED_STATEMENTS;
 import static jedi.db.engine.JediEngine.DATABASE_POOL_HIKARI_VALIDATION_TIMEOUT;
 import static jedi.db.engine.JediEngine.DATABASE_PORT;
@@ -59,8 +66,8 @@ import jedi.db.engine.JediEngine;
  */
 public class DataSource {
    
-//   Criar perfis de conexão para os ambientes dev, test, stage, prod.
-//   O DataSource deve devolver a conexão de acordo com o perfil.
+   //   TODO - Criar perfis de conexão para os ambientes dev, test, stage, prod.
+   //   TODO - O DataSource deve devolver a conexão de acordo com o perfil.
    
    private static ComboPooledDataSource c3p0;
    private static HikariDataSource hikari;
@@ -200,37 +207,32 @@ public class DataSource {
                hikari.setUsername(user);
                hikari.setPassword(password);
                
-//               hikari.addDataSourceProperty("prepStmtCacheSize", DATABASE_MAX_STATEMENTS);
-               hikari.addDataSourceProperty("prepStmtCacheSize", DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SIZE);
-               
-//               hikari.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-               hikari.addDataSourceProperty("prepStmtCacheSqlLimit", DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SQL_LIMIT);
-               
-//               hikari.addDataSourceProperty("cachePrepStmts", "true");
                hikari.addDataSourceProperty("cachePrepStmts", DATABASE_POOL_HIKARI_CACHE_PREPARED_STATEMENTS);
-               
                hikari.addDataSourceProperty("useServerPrepStmts", DATABASE_POOL_HIKARI_USE_SERVER_PREPARED_STATEMENTS);
-               
-//               hikari.addDataSourceProperty("autoCommit", AUTO_COMMIT.value());
-               hikari.setAutoCommit(AUTO_COMMIT.value());
-               
+               hikari.addDataSourceProperty("prepStmtCacheSize", DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SIZE);
+               hikari.addDataSourceProperty("prepStmtCacheSqlLimit", DATABASE_POOL_HIKARI_PREPARED_STATEMENTS_CACHE_SQL_LIMIT);
+               hikari.setAutoCommit(AUTO_COMMIT.value()); // default: true
                hikari.addDataSourceProperty("useUnicode", DATABASE_UNICODE);
                hikari.addDataSourceProperty("characterEncoding", DATABASE_CHARSET);
-               
-//               hikari.addDataSourceProperty("minimumIdle", DATABASE_MAX_POOL_SIZE);
-               hikari.setMinimumIdle(DATABASE_POOL_HIKARI_MINIMUM_IDLE);
-               
-//               hikari.addDataSourceProperty("idleTimeout", DATABASE_MAX_IDLE_TIME); // Default: 600000 (10 minutes)
-               hikari.setIdleTimeout(DATABASE_POOL_HIKARI_IDLE_TIMEOUT); // Default: 600000 (10 minutes)
-//               hikari.setConnectionInitSql(DATABASE_POOL_CONNECTION_TEST_QUERY);
-               hikari.setConnectionTimeout(DATABASE_POOL_HIKARI_CONNECTION_TIMEOUT); // Default: 30000 (30 seconds)
-               hikari.setMaximumPoolSize(DATABASE_POOL_HIKARI_MAX_SIZE);
-               hikari.addDataSourceProperty("minimumPoolSize", DATABASE_POOL_HAKIRI_MIN_SIZE);
-               hikari.setMaxLifetime(DATABASE_POOL_HIKARI_MAX_LIFETIME);
-               hikari.addDataSourceProperty("maxLifetime", DATABASE_POOL_HIKARI_MAX_LIFETIME); // Default: 1800000 (30 minutes)
-               hikari.setLeakDetectionThreshold(DATABASE_POOL_HIKARI_LEAK_DETECTION); // Default: 0 (disabled)
-               hikari.setValidationTimeout(DATABASE_POOL_HIKARI_VALIDATION_TIMEOUT);
+               hikari.setMinimumIdle(DATABASE_POOL_HIKARI_MINIMUM_IDLE); // default: 600000 (10 minutes)
+               hikari.setConnectionTimeout(DATABASE_POOL_HIKARI_CONNECTION_TIMEOUT); // default: 30000 (30 seconds)
+               hikari.setMaximumPoolSize(DATABASE_POOL_HIKARI_MAX_SIZE); // default: 10
+               hikari.addDataSourceProperty("minimumPoolSize", DATABASE_POOL_HAKIRI_MIN_SIZE); // default: same as maximumPoolSize
+               hikari.setMaxLifetime(DATABASE_POOL_HIKARI_MAX_LIFETIME); // default: 1800000 (30 minutes)
+               hikari.addDataSourceProperty("maxLifetime", DATABASE_POOL_HIKARI_MAX_LIFETIME); // default: 1800000 (30 minutes)
+               // Lowest acceptable value for enabling leak detection is 2000 (2 seconds).
+               hikari.setLeakDetectionThreshold(DATABASE_POOL_HIKARI_LEAK_DETECTION); // default: 0 (disabled)
+               hikari.setValidationTimeout(DATABASE_POOL_HIKARI_VALIDATION_TIMEOUT); // default: 5000
                hikari.addDataSourceProperty("autoReconnect", DATABASE_POOL_HIKARI_AUTO_RECONNECT);
+               hikari.addDataSourceProperty("useLocalSessionState", DATABASE_POOL_HIKARI_USE_LOCAL_SESSION_STATE);
+               hikari.addDataSourceProperty("useLocalTransactionState", DATABASE_POOL_HIKARI_USE_LOCAL_TRANSACTION_STATE);
+               hikari.addDataSourceProperty("rewriteBatchedStatements", DATABASE_POOL_HIKARI_REWRITE_BATCHED_STAMENTS);
+               hikari.addDataSourceProperty("cacheResultSetMetadata", DATABASE_POOL_HIKARI_CACHE_RESULTSET_METADATA);
+               hikari.addDataSourceProperty("cacheServerConfiguration", DATABASE_POOL_HIKARI_CACHE_SERVER_CONFIGURATION);
+               hikari.addDataSourceProperty("elideSetAutoCommits", DATABASE_POOL_HIKARI_ELIDE_SET_AUTO_COMMITS);
+               hikari.addDataSourceProperty("maintainTimeStats", DATABASE_POOL_HIKARI_MAINTAIN_TIME_STATS);
+               
+//               hikari.setConnectionInitSql(DATABASE_POOL_CONNECTION_TEST_QUERY); // default: none
 //               hikari.addDataSourceProperty("jdbc4ConnectionTest", DATABASE_POOL_CONNECTION_TEST);
 //               hikari.setConnectionTestQuery(DATABASE_POOL_CONNECTION_TEST_QUERY);
             } else {

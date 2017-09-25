@@ -12,7 +12,8 @@ jar {
    manifest {
       attributes (
          'Implementation-Title': 'Jedi ORM',
-         'Implementation-Version': version
+         'Implementation-Version': version,
+         'Sealed': true
       )
    }
    // inclui o código-fonte no jar construído.
