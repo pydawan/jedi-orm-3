@@ -37,7 +37,7 @@ dependencies {
    compile 'mysql:mysql-connector-java:5.1.31'
    compile 'com.mchange:c3p0:0.9.5.2'
    compile 'com.zaxxer:HikariCP:2.6.3'
-   compile files('./lib/jedi-app-1.0.jar')
+   compile files('./lib/jedi-app-v1.0.0.jar')
    testCompile 'junit:junit:4.12'
 }
 
