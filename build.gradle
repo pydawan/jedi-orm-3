@@ -41,4 +41,6 @@ dependencies {
    testCompile 'junit:junit:4.12'
 }
 
-configurations.all { exclude module: 'slf4j-log4j12' }
+configurations.all { 
+   exclude module: 'slf4j-log4j12'
+}

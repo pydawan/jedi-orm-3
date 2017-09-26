@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 import jedi.app.JediApp;
-import jedi.app.JediAppLoader;
+import jedi.app.loader.JediAppLoader;
 import jedi.db.CharSet;
 import jedi.db.Collation;
 import jedi.db.Privilege;
@@ -1007,7 +1007,7 @@ public abstract class JediEngine {
       JediAppLoader.setDir(APP_LIBS_DIR);
       for (String installedApp : INSTALLED_APPS) {
          JediApp app = JediAppLoader.get(installedApp);
-         List<Class<?>> classes = app.getClasses().get("models");
+         List<Class<?>> classes = (List<Class<?>>) app.getClasses().get("models");
          for (Class<?> clazz : classes) {
             Class<? extends Model> modelClass = (Class<? extends Model>) clazz;
             if (SQL_CREATE_TABLES != null) {
@@ -1040,7 +1040,7 @@ public abstract class JediEngine {
          for (String installedApp : INSTALLED_APPS) {
             if (installedApp.endsWith(appName)) {
                JediApp app = JediAppLoader.get(installedApp);
-               List<Class<?>> classes = app.getClasses().get("models");
+               List<Class<?>> classes = (List<Class<?>>) app.getClasses().get("models");
                for (Class<?> clazz : classes) {
                   Class<? extends Model> modelClass = (Class<? extends Model>) clazz;
                   if (SQL_CREATE_TABLES != null) {
