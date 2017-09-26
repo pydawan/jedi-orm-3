@@ -820,7 +820,6 @@ public class Model implements IModel {
       final int prime = 31;
       int result = 1;
       result = prime * result + id;
-      result = prime * result + ((tableName == null) ? 0 : tableName.hashCode());
       return result;
    }
    
@@ -829,18 +828,16 @@ public class Model implements IModel {
       if (this == obj) return true;
       if (obj == null) return false;
       if (!(obj instanceof Model)) return false;
+      if (getClass() != obj.getClass()) return false;
       Model other = (Model) obj;
       if (id != other.id) return false;
-      if (tableName == null) {
-         if (other.tableName != null) return false;
-      } else if (!tableName.equals(other.tableName)) return false;
       return true;
    }
    
-//   @Override
-//   public boolean equals(Object o) {
-//      return o instanceof Model && this.id == ((Model) o).id;
-//   }
+// @Override
+// public boolean equals(Object o) {
+//    return o instanceof Model && this.id == ((Model) o).id;
+// }
    
    /**
     * @param i
