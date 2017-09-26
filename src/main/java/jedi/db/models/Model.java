@@ -816,9 +816,31 @@ public class Model implements IModel {
    }
    
    @Override
-   public boolean equals(Object o) {
-      return o instanceof Model && this.id == ((Model) o).id;
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + id;
+      result = prime * result + ((tableName == null) ? 0 : tableName.hashCode());
+      return result;
    }
+   
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (obj == null) return false;
+      if (!(obj instanceof Model)) return false;
+      Model other = (Model) obj;
+      if (id != other.id) return false;
+      if (tableName == null) {
+         if (other.tableName != null) return false;
+      } else if (!tableName.equals(other.tableName)) return false;
+      return true;
+   }
+   
+//   @Override
+//   public boolean equals(Object o) {
+//      return o instanceof Model && this.id == ((Model) o).id;
+//   }
    
    /**
     * @param i
