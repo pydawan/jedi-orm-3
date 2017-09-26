@@ -734,6 +734,25 @@ public class Model implements IModel {
       }
    }
    
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + id;
+      return result;
+   }
+   
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (obj == null) return false;
+      if (!(obj instanceof Model)) return false;
+      if (getClass() != obj.getClass()) return false;
+      Model other = (Model) obj;
+      if (id != other.id) return false;
+      return true;
+   }
+   
    public int compareTo(Model model) {
       if (this.id < model.id) {
          return -1;
@@ -815,33 +834,8 @@ public class Model implements IModel {
       return String.format("<%s: %s>", clazz, this.unicode());
    }
    
-   @Override
-   public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + id;
-      return result;
-   }
-   
-   @Override
-   public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (!(obj instanceof Model)) return false;
-      if (getClass() != obj.getClass()) return false;
-      Model other = (Model) obj;
-      if (id != other.id) return false;
-      return true;
-   }
-   
-// @Override
-// public boolean equals(Object o) {
-//    return o instanceof Model && this.id == ((Model) o).id;
-// }
-   
    /**
-    * @param i
-    *           int
+    * @param i int
     * @return String
     */
    public String toJSON(int i) {
