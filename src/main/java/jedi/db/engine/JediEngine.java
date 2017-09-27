@@ -1011,14 +1011,17 @@ public abstract class JediEngine {
       JediAppLoader.setDir(APP_LIBS_DIR);
       for (String installedApp : INSTALLED_APPS) {
          JediApp app = JediAppLoader.get(installedApp);
+         if (app == null) {
+            continue;
+         }
          List<Class<?>> classes = (List<Class<?>>) app.getClasses().get("models");
          for (Class<?> clazz : classes) {
             Class<? extends Model> modelClass = (Class<? extends Model>) clazz;
             if (SQL_CREATE_TABLES != null) {
                String tableName = TableUtil.getTableName(modelClass);
 //               tableName = String.format("%s_%s", app.getDBTable(), tableName);
-//               String sql = JediEngine.getSQL(app, modelClass);
-               String sql = JediEngine.getSQL(modelClass);
+               String sql = JediEngine.getSQL(app, modelClass);
+//               String sql = JediEngine.getSQL(modelClass);
                SQL_CREATE_TABLES.add(sql);
                if (CREATE_TABLES != null) {
                   CREATE_TABLES.put(tableName, sql);
@@ -3032,7 +3035,8 @@ public abstract class JediEngine {
       if (c != null) {
          String tableName = TableUtil.getTableName(c);
          if (app != null) {
-            tableName = String.format("%s_%s", app.getDBTable(), tableName);
+//            tableName = String.format("%s_%s", app.getDBTable(), tableName);
+            tableName = String.format("%s_%s", app.name().toLowerCase(), tableName);
          }
          if (!GENERATED_TABLES.contains(tableName)) {
             GENERATED_TABLES.add(tableName);
