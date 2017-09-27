@@ -43,7 +43,10 @@ public enum Regex {
     FIELD_LOOKUP_OR("or|Or|OR"),
     LIKE_DATE("(\\w+\\s+(LIKE|NOT LIKE)\\s+'%?(\\d+/){2}\\d+%?')+"),
     LIKE_TIME("(\\w+\\s+(LIKE|NOT LIKE)\\s+'%?(\\d+:){2}\\d+%?')+"),
-    LIKE_DATETIME("(\\w+([\\._@]\\w+)+\\s+(LIKE|NOT LIKE)\\s+'%?\\d{1,2}/{1,2}\\d{0,2}/{0,1}\\d{0,4}( \\d{0,2}:{0,2}\\d{0,2}:{0,1}\\d{0,2})?%?')+");
+    LIKE_DATETIME("(\\w+([\\._@]\\w+)+\\s+(LIKE|NOT LIKE)\\s+'%?\\d{1,2}/{1,2}\\d{0,2}/{0,1}\\d{0,4}( \\d{0,2}:{0,2}\\d{0,2}:{0,1}\\d{0,2})?%?')+"),
+    SQL_DATETIME_FORMAT("\\d{4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}"),
+    SQL_DATE_FORMAT("\\d{4}-\\d{1,2}-\\d{1,2}"),
+    SQL_TIME_FORMAT("\\d{1,2}:\\d{1,2}:\\d{1,2}");
    
     // TODO search
     // TODO regex
