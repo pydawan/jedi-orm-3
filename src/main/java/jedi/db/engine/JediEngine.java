@@ -92,6 +92,7 @@ public abstract class JediEngine {
    public static final String BUILD_DIR = PROJECT_DIR + "build/";
    public static final String DOC_DIR = PROJECT_DIR + "doc/";
    public static final String SRC_DIR = PROJECT_DIR + "src/";
+   public static final String LIB_DIR = PROJECT_DIR + "lib/";
    
    public static final String SRC_MAIN_DIR = SRC_DIR + "main/";
    public static final String SRC_MAIN_JAVA_DIR = SRC_MAIN_DIR + "java/";
@@ -102,6 +103,7 @@ public abstract class JediEngine {
    public static final String SRC_MAIN_WEBAPP_DIR = SRC_MAIN_DIR + "webapp/";
    public static final String SRC_MAIN_WEBAPP_METAINF_DIR = SRC_MAIN_WEBAPP_DIR + "META-INF/";
    public static final String SRC_MAIN_WEBAPP_WEBINF_DIR = SRC_MAIN_WEBAPP_DIR + "WEB-INF/";
+   public static final String SRC_MAIN_WEBAPP_WEBINF__LIB_DIR = SRC_MAIN_WEBAPP_WEBINF_DIR + "lib/";
    public static final String SRC_MAIN_WEBAPP_WEBINF_JEDI_PROPERTIES = SRC_MAIN_WEBAPP_WEBINF_DIR + "jedi.properties";
    
    public static final String SRC_TEST_DIR = SRC_MAIN_DIR.replace("main", "test");
@@ -167,6 +169,8 @@ public abstract class JediEngine {
    public static boolean DATABASE_AUTO_INCREMENT = true;
    public static boolean FOREIGN_KEY_CHECKS = true;
    public static boolean WEB_APP = false;
+   public static boolean GRADLE_WEB_APP = false;
+   public static boolean MAVEN_WEB_APP = false;
    public static boolean DEBUG = false;
    public static boolean MAVEN_PROJECT = false;
    public static boolean GRADLE_PROJECT = true;
@@ -573,9 +577,9 @@ public abstract class JediEngine {
                // (except the models directory of the Framework).
                if (!appDirContent.getAbsolutePath().contains(JediEngine.JEDI_DB_MODELS) &&
                   (appDirContent.getAbsolutePath().endsWith("model") ||
-                   appDirContent.getAbsolutePath().endsWith("modelo") ||
                    appDirContent.getAbsolutePath().endsWith("models") ||
-                   appDirContent.getAbsolutePath().endsWith("models"))) {
+                   appDirContent.getAbsolutePath().endsWith("modelo") ||
+                   appDirContent.getAbsolutePath().endsWith("modelos"))) {
                   // Gets all files in app/models.
                   File[] appModelsFiles = appDirContent.listFiles();
                   for (File appModelFile : appModelsFiles) {
@@ -1012,8 +1016,9 @@ public abstract class JediEngine {
             Class<? extends Model> modelClass = (Class<? extends Model>) clazz;
             if (SQL_CREATE_TABLES != null) {
                String tableName = TableUtil.getTableName(modelClass);
-               tableName = String.format("%s_%s", app.getDBTable(), tableName);
-               String sql = JediEngine.getSQL(app, modelClass);
+//               tableName = String.format("%s_%s", app.getDBTable(), tableName);
+//               String sql = JediEngine.getSQL(app, modelClass);
+               String sql = JediEngine.getSQL(modelClass);
                SQL_CREATE_TABLES.add(sql);
                if (CREATE_TABLES != null) {
                   CREATE_TABLES.put(tableName, sql);
@@ -1866,7 +1871,10 @@ public abstract class JediEngine {
                   key.equals("db.unicode") || 
                   key.equals("database.unicode")) {
                DATABASE_UNICODE = Boolean.parseBoolean(value);
-            } else if (key.startsWith("installed.app")) {
+            } else if (
+                  key.startsWith("installed.app") ||
+                  key.startsWith("db.installed.app") ||
+                  key.startsWith("database.installed.app")) {
                if (!INSTALLED_APPS.contains(value)) {
                   INSTALLED_APPS.add(value);
                }
@@ -1895,6 +1903,12 @@ public abstract class JediEngine {
                   CODE_GENERATION = Boolean.parseBoolean(value);
                }
             } else if (
+                  key.equals("build.maven") ||
+                  key.equals("db.build.maven") ||
+                  key.equals("database.build.maven") ||
+                  key.equals("build.mvn") ||
+                  key.equals("db.build.mvn") ||
+                  key.equals("database.build.mvn") ||
                   key.equals("maven") || 
                   key.equals("db.maven") || 
                   key.equals("database.maven") ||
@@ -1915,6 +1929,9 @@ public abstract class JediEngine {
                   key.equals("database.project.mvn")) {
                MAVEN_PROJECT = Boolean.parseBoolean(value);
             } else if (
+                  key.equals("build.gradle") ||
+                  key.equals("db.build.gradle") ||
+                  key.equals("database.build.gradle") ||
                   key.equals("gradle") || 
                   key.equals("db.gradle") || 
                   key.equals("database.gradle") ||
@@ -1948,10 +1965,13 @@ public abstract class JediEngine {
             } else if (
                   key.equals("project.type") || 
                   key.equals("db.project.type") || 
-                  key.equals("database.project.type")) {
+                  key.equals("database.project.type") ||
+                  key.equals("build") ||
+                  key.equals("db.build") ||
+                  key.equals("database.build")) {
                if (value.equals("gradle")) {
                   GRADLE_PROJECT = true;
-               } else if (value.equals("maven")) {
+               } else if (value.equals("maven") || value.equals("mvn")) {
                   MAVEN_PROJECT = true;
                } else {
                   
@@ -1969,9 +1989,41 @@ public abstract class JediEngine {
                if (value.matches("(true|false)")) {
                   DATABASE_LOGGING = Boolean.parseBoolean(value);
                }
+            } else if (
+                  key.equals("webapp") ||
+                  key.equals("db.webapp") ||
+                  key.equals("database.webapp")) {
+                  WEB_APP = Boolean.parseBoolean(value);
+            } else if (
+                  key.equals("gradle.webapp") ||
+                  key.equals("db.gradle.webapp") ||
+                  key.equals("database.gradle.webapp") ||
+                  key.equals("build.gradle.webapp") ||
+                  key.equals("db.build.gradle.webapp") ||
+                  key.equals("database.build.gradle.webapp")) {
+                  boolean gradleWebApp = Boolean.parseBoolean(value);
+                  GRADLE_PROJECT = gradleWebApp;
+                  GRADLE_WEB_APP = gradleWebApp;
+            } else if (
+                  key.equals("maven.webapp") ||
+                  key.equals("db.maven.webapp") ||
+                  key.equals("database.maven.webapp") ||
+                  key.equals("build.maven.webapp") ||
+                  key.equals("db.build.maven.webapp") ||
+                  key.equals("database.build.maven.webapp")) {
+                  boolean mavenWebApp = Boolean.parseBoolean(value);
+                  MAVEN_PROJECT = mavenWebApp;
+                  MAVEN_WEB_APP = mavenWebApp;
+            } else {
+               
             }
             if (MAVEN_PROJECT || GRADLE_PROJECT) {
                setAppDirs(APP_ROOT_DIR);
+            }
+            if (GRADLE_WEB_APP || MAVEN_WEB_APP) {
+               APP_LIBS_DIR = SRC_MAIN_WEBAPP_WEBINF__LIB_DIR;
+            } else {
+               APP_LIBS_DIR = LIB_DIR;
             }
          }
          JEDI_PROPERTIES_LOADED = true;
