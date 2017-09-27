@@ -1,5 +1,7 @@
 package jedi.types;
 
+import jedi.db.models.Model;
+
 /**
  * @author thiago
  * @version v1.0.0
@@ -37,6 +39,17 @@ public class DateTime extends java.util.Date {
    
    public DateTime(int year, int month, int date, int hrs, int min, int sec) {
       super(year - 1900, month - 1, date, hrs, min, sec);
+   }
+   
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (obj == null) return false;
+      if (!(obj instanceof DateTime)) return false;
+      if (getClass() != obj.getClass()) return false;
+      DateTime other = (DateTime) obj;
+      if (!this.toString().equals(other.toString())) return false;
+      return true;
    }
    
    // Getters
