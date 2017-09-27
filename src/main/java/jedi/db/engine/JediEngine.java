@@ -164,6 +164,7 @@ public abstract class JediEngine {
    public static ExceptionHandling EXCEPTION_HANDLING = ExceptionHandling.THROW;
    public static String SQL_COLUMN_IDENTATION = "    ";
    public static PoolEngine DATABASE_POOL_ENGINE = PoolEngine.JEDI;
+   public static boolean PREFIX_APP_TABLE = true;
    public static AutoCommit AUTO_COMMIT = AutoCommit.YES;
    public static AutoClose AUTO_CLOSE = AutoClose.NO;
    public static boolean DATABASE_AUTO_INCREMENT = true;
@@ -1019,9 +1020,12 @@ public abstract class JediEngine {
             Class<? extends Model> modelClass = (Class<? extends Model>) clazz;
             if (SQL_CREATE_TABLES != null) {
                String tableName = TableUtil.getTableName(modelClass);
-//               tableName = String.format("%s_%s", app.getDBTable(), tableName);
-               String sql = JediEngine.getSQL(app, modelClass);
-//               String sql = JediEngine.getSQL(modelClass);
+               String sql = "";
+               if (PREFIX_APP_TABLE) {
+                  sql = JediEngine.getSQL(app, modelClass);
+               } else {
+                  sql = JediEngine.getSQL(modelClass);
+               }
                SQL_CREATE_TABLES.add(sql);
                if (CREATE_TABLES != null) {
                   CREATE_TABLES.put(tableName, sql);
@@ -1875,12 +1879,17 @@ public abstract class JediEngine {
                   key.equals("database.unicode")) {
                DATABASE_UNICODE = Boolean.parseBoolean(value);
             } else if (
-                  key.startsWith("installed.app") ||
-                  key.startsWith("db.installed.app") ||
-                  key.startsWith("database.installed.app")) {
+                  key.startsWith("app.install") ||
+                  key.startsWith("db.app.install") ||
+                  key.startsWith("database.app.install")) {
                if (!INSTALLED_APPS.contains(value)) {
                   INSTALLED_APPS.add(value);
                }
+            } else if (
+                  key.startsWith("app.table.prefix") ||
+                  key.startsWith("db.app.table.prefix") ||
+                  key.startsWith("database.app.table.prefix")) {
+                  PREFIX_APP_TABLE = Boolean.parseBoolean(value);
             } else if (
                   key.equals("codegen") || 
                   key.equals("db.codegen") || 
