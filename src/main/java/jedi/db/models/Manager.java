@@ -177,14 +177,10 @@ public class Manager implements IManager {
             if (connection.toString().startsWith("oracle")) {
                id.set(
                   obj,
-                  ((java.math.BigDecimal) resultSet
-                     .getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
-                        .intValue());
+                  ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1))).intValue());
             } else {
                // MySQL and PostgreSQL returns a Integer object.
-               id.set(
-                  obj,
-                  resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
+               id.set(obj, resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
             }
             List<Field> _fields = JediEngine.getAllFields(this.entity);
             for (Field field : _fields) {
@@ -192,8 +188,7 @@ public class Manager implements IManager {
                if (!JediEngine.isJediField(field)) {
                   continue;
                }
-               if (field.toString().substring(field.toString().lastIndexOf('.') + 1).equals(
-                  "serialVersionUID")) {
+               if (field.toString().substring(field.toString().lastIndexOf('.') + 1).equals("serialVersionUID")) {
                   continue;
                }
                if (field.getName().equalsIgnoreCase("objects")) {
@@ -205,8 +200,7 @@ public class Manager implements IManager {
                FetchType fetchType = JediEngine.FETCH_TYPE;
                Manager manager = null;
                if (manyToManyFieldAnnotation != null) {
-                  fetchType = fetchType.equals(FetchType.NONE)
-                     ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                  fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
                   if (fetchType.equals(FetchType.EAGER)) {
                      String packageName = this.entity.getPackage().getName();
                      String model = manyToManyFieldAnnotation.model().getSimpleName();
@@ -215,11 +209,9 @@ public class Manager implements IManager {
                      Class clazz = null;
                      if (model.isEmpty()) {
                         ParameterizedType genericType = null;
-                        if (ParameterizedType.class
-                           .isAssignableFrom(field.getGenericType().getClass())) {
+                        if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                            genericType = (ParameterizedType) field.getGenericType();
-                           superClazz =
-                              ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
+                           superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
                            if (superClazz == Model.class) {
                               clazz = (Class) genericType.getActualTypeArguments()[0];
                               model = clazz.getSimpleName();
@@ -238,17 +230,12 @@ public class Manager implements IManager {
                      Class associatedModelClass = Class.forName(intermediateModelclassName);
                      manager = new Manager(associatedModelClass);
                      QuerySet querySetAssociatedModels = null;
-                     String intermediateModelName =
-                        manyToManyFieldAnnotation.through().getSimpleName();
-                     intermediateModelName =
-                        Model.class.getSimpleName().equals(intermediateModelName) ? ""
-                           : intermediateModelName;
+                     String intermediateModelName = manyToManyFieldAnnotation.through().getSimpleName();
+                     intermediateModelName = Model.class.getSimpleName().equals(intermediateModelName) ? "" : intermediateModelName;
                      if (intermediateModelName != null && !intermediateModelName.trim().isEmpty()) {
-                        intermediateModelclassName =
-                           String.format("%s.%s", packageName, intermediateModelName);
+                        intermediateModelclassName = String.format("%s.%s", packageName, intermediateModelName);
                         Class intermediateModelClass = Class.forName(intermediateModelclassName);
-                        String intermediateTableName =
-                           ((Model) intermediateModelClass.newInstance()).getTableName();
+                        String intermediateTableName = ((Model) intermediateModelClass.newInstance()).getTableName();
                         querySetAssociatedModels = manager.raw(
                            String.format(
                               "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s WHERE %s_id = %d)",
@@ -276,11 +263,9 @@ public class Manager implements IManager {
                   }
                } else if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
                   if (oneToOneFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
                   } else {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
                   }
                   if (fetchType.equals(FetchType.EAGER)) {
                      // Recovers the attribute class.
@@ -296,8 +281,7 @@ public class Manager implements IManager {
                   }
                } else {
                   // Sets the fields that aren't Model instances.
-                  if ((field.getType().getSimpleName().equals("int") ||
-                     field.getType().getSimpleName().equals("Integer")) &&
+                  if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                      connection.toString().startsWith("oracle")) {
                      if (resultSet.getObject(TableUtil.getColumnName(field)) == null) {
                         field.set(obj, 0);
@@ -311,7 +295,10 @@ public class Manager implements IManager {
                      columnValue = convertZeroDateToNull(columnValue);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        columnValue = new DateTime(timestamp.getTime());
+                        // TODO - Refatoração mudança de jedi.types.DateTime
+                        // para java.util.Date
+                        // columnValue = new DateTime(timestamp.getTime());
+                        columnValue = new Date(timestamp.getTime());
                      }
                      field.set(obj, columnValue);
                   }
@@ -386,13 +373,10 @@ public class Manager implements IManager {
                fields[i] = fields[i].replace(",", ", ");
                // Checks if the current pair contains __startswith, __contains
                // or __endswith.
-               if (fields[i].indexOf("__startswith") > -1 ||
-                  fields[i].indexOf("__!startswith") > -1 ||
-                  fields[i].indexOf("__istartswith") > -1 ||
-                  fields[i].indexOf("__!istartswith") > -1 ||
-                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__icontains") > -1 ||
-                  fields[i].indexOf("__!contains") > -1 || fields[i].indexOf("__!icontains") > -1 ||
-                  fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
+               if (fields[i].indexOf("__startswith") > -1 || fields[i].indexOf("__!startswith") > -1 ||
+                  fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
+                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__icontains") > -1 || fields[i].indexOf("__!contains") > -1 ||
+                  fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
                   fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
                   // Creates a LIKE statement in SQL.
                   if (fields[i].indexOf("__startswith") > -1) {
@@ -406,14 +390,11 @@ public class Manager implements IManager {
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\'";
                   } else if (fields[i].indexOf("__istartswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__!istartswith") > -1) {
-                     fields[i] = fields[i].replaceAll(
-                        "^(.*)__!istartswith *= *(.*)$",
-                        "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__contains") > -1) {
@@ -429,14 +410,12 @@ public class Manager implements IManager {
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\'";
                   } else if (fields[i].indexOf("__icontains") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__!icontains") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
@@ -445,8 +424,7 @@ public class Manager implements IManager {
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__iendswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__!endswith") > -1) {
@@ -454,8 +432,7 @@ public class Manager implements IManager {
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__!iendswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   }
@@ -523,8 +500,7 @@ public class Manager implements IManager {
                   fields[i] = fields[i].replace("__!exact = ", " != ");
                }
                if (fields[i].indexOf("__isnull") > -1) {
-                  String bool =
-                     fields[i].substring(fields[i].indexOf("=") + 1, fields[i].length()).trim();
+                  String bool = fields[i].substring(fields[i].indexOf("=") + 1, fields[i].length()).trim();
                   if (bool.equalsIgnoreCase("true")) {
                      fields[i] = fields[i].replace("__isnull = ", " IS NULL ");
                   }
@@ -556,9 +532,7 @@ public class Manager implements IManager {
                   Field id = jedi.db.models.Model.class.getDeclaredField("id");
                   id.setAccessible(true);
                   if (connection.toString().startsWith("oracle")) {
-                     id.set(
-                        obj,
-                        ((java.math.BigDecimal) resultSet.getObject(id.getName())).intValue());
+                     id.set(obj, ((java.math.BigDecimal) resultSet.getObject(id.getName())).intValue());
                   } else {
                      id.set(obj, resultSet.getObject(id.getName()));
                   }
@@ -584,8 +558,7 @@ public class Manager implements IManager {
                   FetchType fetchType = JediEngine.FETCH_TYPE;
                   Manager manager = null;
                   if (manyToManyFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
                      if (fetchType.equals(FetchType.EAGER)) {
                         Class superClazz = null;
                         Class clazz = null;
@@ -594,11 +567,9 @@ public class Manager implements IManager {
                         model = Model.class.getSimpleName().equals(model) ? "" : model;
                         if (model.isEmpty()) {
                            ParameterizedType genericType = null;
-                           if (ParameterizedType.class
-                              .isAssignableFrom(field.getGenericType().getClass())) {
+                           if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                               genericType = (ParameterizedType) field.getGenericType();
-                              superClazz = ((Class) (genericType.getActualTypeArguments()[0]))
-                                 .getSuperclass();
+                              superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
                               if (superClazz == Model.class) {
                                  clazz = (Class) genericType.getActualTypeArguments()[0];
                                  model = clazz.getSimpleName();
@@ -613,8 +584,7 @@ public class Manager implements IManager {
                               references = TableUtil.getTableName(model);
                            }
                         }
-                        Class associatedModelClass =
-                           Class.forName(String.format("%s.%s", packageName, model));
+                        Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, model));
                         manager = new Manager(associatedModelClass);
                         List<List<Map<String, Object>>> recordSet = null;
                         // Performs a SQL query.
@@ -633,8 +603,7 @@ public class Manager implements IManager {
                         args = args.replace("}", "");
                         args = args.replace("=", "");
                         args = args.replace(", ", ",");
-                        args =
-                           args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
+                        args = args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
                         args = String.format("id__in=[%s]", args);
                         QuerySet querySetAssociatedModels = manager._filter(args);
                         field.set(obj, querySetAssociatedModels);
@@ -643,11 +612,9 @@ public class Manager implements IManager {
                      }
                   } else if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
                      if (oneToOneFieldAnnotation != null) {
-                        fetchType = fetchType.equals(FetchType.NONE)
-                           ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                        fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
                      } else {
-                        fetchType = fetchType.equals(FetchType.NONE)
-                           ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                        fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
                      }
                      if (fetchType.equals(FetchType.EAGER)) {
                         // If it's recovers the field's class.
@@ -666,8 +633,7 @@ public class Manager implements IManager {
                      }
                   } else {
                      // Sets fields the aren't Model's instances.
-                     if ((field.getType().getSimpleName().equals("int") ||
-                        field.getType().getSimpleName().equals("Integer")) &&
+                     if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                         connection.toString().startsWith("oracle")) {
                         if (resultSet.getObject(TableUtil.getColumnName(field.getName())) == null) {
                            field.set(obj, 0);
@@ -681,7 +647,10 @@ public class Manager implements IManager {
                         Object columnValue = resultSet.getObject(columnName);
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           columnValue = new DateTime(timestamp.getTime());
+                           // TODO - Refatoração mudança de jedi.types.DateTime
+                           // para java.util.Date
+                           // columnValue = new DateTime(timestamp.getTime());
+                           columnValue = new Date(timestamp.getTime());
                         }
                         field.set(obj, columnValue);
                      }
@@ -779,8 +748,7 @@ public class Manager implements IManager {
                   f.set(obj, Float.parseFloat(value));
                } else if (value.matches("\\d+.d+")) { // Double
                   f.set(obj, Double.parseDouble(value));
-               } else if (f.getType().getName().equals("java.util.Date") ||
-                  f.getType().getName().equals("jedi.types.DateTime")) {
+               } else if (f.getType().getName().equals("java.util.Date") || f.getType().getName().equals("jedi.types.DateTime")) {
                   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                   Date date = formatter.parse(list[i].split("=")[1].replace("'", ""));
                   f.set(obj, date);
@@ -832,8 +800,7 @@ public class Manager implements IManager {
          String sql = "";
          String databaseEngine = JediEngine.DATABASE_ENGINE;
          if (databaseEngine != null) {
-            if (databaseEngine.trim().equalsIgnoreCase("mysql") ||
-               databaseEngine.trim().equalsIgnoreCase("postgresql") ||
+            if (databaseEngine.trim().equalsIgnoreCase("mysql") || databaseEngine.trim().equalsIgnoreCase("postgresql") ||
                databaseEngine.trim().equalsIgnoreCase("h2")) {
                sql = String.format("SELECT id FROM %s ORDER BY id DESC LIMIT 1", tableName);
             } else if (databaseEngine.trim().equalsIgnoreCase("oracle")) {
@@ -894,8 +861,7 @@ public class Manager implements IManager {
                   if (conditions[i].contains("=")) {
                      String fieldName = conditions[i].substring(0, conditions[i].lastIndexOf("="));
                      String fieldValue = conditions[i].substring(conditions[i].lastIndexOf("="));
-                     conditions[i] =
-                        String.format("%s%s", TableUtil.getColumnName(fieldName), fieldValue);
+                     conditions[i] = String.format("%s%s", TableUtil.getColumnName(fieldName), fieldValue);
                   }
                   // Adds a blank space between the field's name and value.
                   conditions[i] = conditions[i].replace("=", " = ");
@@ -906,18 +872,12 @@ public class Manager implements IManager {
                   conditions[i] = conditions[i].replace(",", ", ");
                   // Checks if the current pair contains __startswith,
                   // __contains or __endswith.
-                  if (conditions[i].indexOf("__startswith") > -1 ||
-                     conditions[i].indexOf("__!startswith") > -1 ||
-                     conditions[i].indexOf("__istartswith") > -1 ||
-                     conditions[i].indexOf("__!istartswith") > -1 ||
-                     conditions[i].indexOf("__contains") > -1 ||
-                     conditions[i].indexOf("__!contains") > -1 ||
-                     conditions[i].indexOf("__icontains") > -1 ||
-                     conditions[i].indexOf("__!icontains") > -1 ||
-                     conditions[i].indexOf("__endswith") > -1 ||
-                     conditions[i].indexOf("__!endswith") > -1 ||
-                     conditions[i].indexOf("__iendswith") > -1 ||
-                     conditions[i].indexOf("__!iendswith") > -1) {
+                  if (conditions[i].indexOf("__startswith") > -1 || conditions[i].indexOf("__!startswith") > -1 ||
+                     conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
+                     conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
+                     conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
+                     conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
+                     conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
                      // Creates the LIKE SQL statement.
                      if (conditions[i].indexOf("__startswith") > -1) {
                         conditions[i] = conditions[i].replace("__startswith = ", " LIKE ");
@@ -930,14 +890,11 @@ public class Manager implements IManager {
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\'";
                      } else if (conditions[i].indexOf("__istartswith") > -1) {
-                        conditions[i] = conditions[i]
-                           .replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\')";
                      } else if (conditions[i].indexOf("__!istartswith") > -1) {
-                        conditions[i] = conditions[i].replaceAll(
-                           "^(.*)__!istartswith *= *(.*)$",
-                           "UPPER($1) NOT LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\')";
                      } else if (conditions[i].indexOf("__contains") > -1) {
@@ -953,15 +910,12 @@ public class Manager implements IManager {
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\'";
                      } else if (conditions[i].indexOf("__icontains") > -1) {
-                        conditions[i] = conditions[i]
-                           .replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\')";
                      } else if (conditions[i].indexOf("__!icontains") > -1) {
-                        conditions[i] = conditions[i].replaceAll(
-                           "^(.*)__!icontains *= *(.*)$",
-                           "UPPER($1) NOT LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\')";
@@ -974,14 +928,11 @@ public class Manager implements IManager {
                         // Replaces 'value' by '%value'.
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                      } else if (conditions[i].indexOf("__iendswith") > -1) {
-                        conditions[i] = conditions[i]
-                           .replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                         // Replaces 'value' by '%value'.
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                      } else if (conditions[i].indexOf("__!iendswith") > -1) {
-                        conditions[i] = conditions[i].replaceAll(
-                           "^(.*)__!iendswith *= *(.*)$",
-                           "UPPER($1) NOT LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                         // Replaces 'value' by '%value'.
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                      } else {
@@ -1021,29 +972,25 @@ public class Manager implements IManager {
                      conditions[i] = conditions[i].replace("__lt = ", " < ");
                   }
                   if (conditions[i].indexOf("__!lt") > -1) {
-                     conditions[i] =
-                        conditions[i].replaceAll("^(.*)__!lt *= *(.*)$", "NOT $1 < $2");
+                     conditions[i] = conditions[i].replaceAll("^(.*)__!lt *= *(.*)$", "NOT $1 < $2");
                   }
                   if (conditions[i].indexOf("__lte") > -1) {
                      conditions[i] = conditions[i].replace("__lte = ", " <= ");
                   }
                   if (conditions[i].indexOf("__!lte") > -1) {
-                     conditions[i] =
-                        conditions[i].replaceAll("^(.*)__!lte *= *(.*)$", "NOT $1 <= $2");
+                     conditions[i] = conditions[i].replaceAll("^(.*)__!lte *= *(.*)$", "NOT $1 <= $2");
                   }
                   if (conditions[i].indexOf("__gt") > -1) {
                      conditions[i] = conditions[i].replace("__gt = ", " > ");
                   }
                   if (conditions[i].indexOf("__!gt") > -1) {
-                     conditions[i] =
-                        conditions[i].replaceAll("^(.*)__!gt *= *(.*)$", "NOT $1 > $2");
+                     conditions[i] = conditions[i].replaceAll("^(.*)__!gt *= *(.*)$", "NOT $1 > $2");
                   }
                   if (conditions[i].indexOf("__gte") > -1) {
                      conditions[i] = conditions[i].replace("__gte = ", " >= ");
                   }
                   if (conditions[i].indexOf("__!gte") > -1) {
-                     conditions[i] =
-                        conditions[i].replaceAll("^(.*)__!gte *= *(.*)$", "NOT $1 >= $2");
+                     conditions[i] = conditions[i].replaceAll("^(.*)__!gte *= *(.*)$", "NOT $1 >= $2");
                   }
                   if (conditions[i].indexOf("__exact") > -1) {
                      conditions[i] = conditions[i].replace("__exact = ", " = ");
@@ -1052,9 +999,7 @@ public class Manager implements IManager {
                      conditions[i] = conditions[i].replace("__!exact = ", " != ");
                   }
                   if (conditions[i].indexOf("__isnull") > -1) {
-                     String bool = conditions[i]
-                        .substring(conditions[i].indexOf("=") + 1, conditions[i].length())
-                        .trim();
+                     String bool = conditions[i].substring(conditions[i].indexOf("=") + 1, conditions[i].length()).trim();
                      if (bool.equalsIgnoreCase("true")) {
                         conditions[i] = conditions[i].replace("__isnull = ", " IS NULL ");
                      }
@@ -1144,13 +1089,10 @@ public class Manager implements IManager {
                fields[i] = fields[i].replace(",", ", ");
                // Checks if the current pair contains __startswith, __contains
                // ou __endswith.
-               if (fields[i].indexOf("__startswith") > -1 ||
-                  fields[i].indexOf("__!startswith") > -1 ||
-                  fields[i].indexOf("__istartswith") > -1 ||
-                  fields[i].indexOf("__!istartswith") > -1 ||
-                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__!contains") > -1 ||
-                  fields[i].indexOf("__icontains") > -1 || fields[i].indexOf("__!icontains") > -1 ||
-                  fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
+               if (fields[i].indexOf("__startswith") > -1 || fields[i].indexOf("__!startswith") > -1 ||
+                  fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
+                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__!contains") > -1 || fields[i].indexOf("__icontains") > -1 ||
+                  fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
                   fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
                   // Creates a LIKE SQL statement.
                   if (fields[i].indexOf("__startswith") > -1) {
@@ -1164,14 +1106,11 @@ public class Manager implements IManager {
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\'";
                   } else if (fields[i].indexOf("__istartswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__!istartswith") > -1) {
-                     fields[i] = fields[i].replaceAll(
-                        "^(.*)__!istartswith *= *(.*)$",
-                        "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__contains") > -1) {
@@ -1187,14 +1126,12 @@ public class Manager implements IManager {
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\'";
                   } else if (fields[i].indexOf("__icontains") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__!icontains") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
@@ -1203,8 +1140,7 @@ public class Manager implements IManager {
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__iendswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__!endswith") > -1) {
@@ -1212,8 +1148,7 @@ public class Manager implements IManager {
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__!iendswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else {
@@ -1285,8 +1220,7 @@ public class Manager implements IManager {
                   fields[i] = fields[i].replace("__!exact = ", " != ");
                }
                if (fields[i].indexOf("__isnull") > -1) {
-                  String bool =
-                     fields[i].substring(fields[i].indexOf("=") + 1, fields[i].length()).trim();
+                  String bool = fields[i].substring(fields[i].indexOf("=") + 1, fields[i].length()).trim();
                   if (bool.equalsIgnoreCase("true")) {
                      fields[i] = fields[i].replace("__isnull = ", " IS NULL ");
                   }
@@ -1319,14 +1253,10 @@ public class Manager implements IManager {
                   if (connection.toString().startsWith("oracle")) {
                      id.set(
                         obj,
-                        ((java.math.BigDecimal) resultSet
-                           .getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
-                              .intValue());
+                        ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
+                           .intValue());
                   } else {
-                     id.set(
-                        obj,
-                        resultSet
-                           .getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
+                     id.set(obj, resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
                   }
                }
                List<Field> _fields = JediEngine.getAllFields(this.entity);
@@ -1347,8 +1277,7 @@ public class Manager implements IManager {
                   FetchType fetchType = JediEngine.FETCH_TYPE;
                   Manager manager = null;
                   if (manyToManyFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
                      if (fetchType.equals(FetchType.EAGER)) {
                         Class superClazz = null;
                         Class clazz = null;
@@ -1356,11 +1285,9 @@ public class Manager implements IManager {
                         model = Model.class.getSimpleName().equals(model) ? "" : model;
                         if (model.isEmpty()) {
                            ParameterizedType genericType = null;
-                           if (ParameterizedType.class
-                              .isAssignableFrom(field.getGenericType().getClass())) {
+                           if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                               genericType = (ParameterizedType) field.getGenericType();
-                              superClazz = ((Class) (genericType.getActualTypeArguments()[0]))
-                                 .getSuperclass();
+                              superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
                               if (superClazz == Model.class) {
                                  clazz = (Class) genericType.getActualTypeArguments()[0];
                                  model = clazz.getSimpleName();
@@ -1376,8 +1303,7 @@ public class Manager implements IManager {
                            }
                         }
                         String packageName = this.entity.getPackage().getName();
-                        Class associatedModelClass =
-                           Class.forName(String.format("%s.%s", packageName, model));
+                        Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, model));
                         manager = new Manager(associatedModelClass);
                         QuerySet querySetAssociatedModels = manager.raw(
                            String.format(
@@ -1395,26 +1321,21 @@ public class Manager implements IManager {
                      }
                   } else if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
                      if (oneToOneFieldAnnotation != null) {
-                        fetchType = fetchType.equals(FetchType.NONE)
-                           ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                        fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
                      } else {
-                        fetchType = fetchType.equals(FetchType.NONE)
-                           ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                        fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
                      }
                      if (fetchType.equals(FetchType.EAGER)) {
                         Class associatedModelClass = Class.forName(field.getType().getName());
                         manager = new Manager(associatedModelClass);
-                        Model associatedModel = manager.get(
-                           String.format("id"),
-                           resultSet
-                              .getObject(String.format("%s_id", TableUtil.getColumnName(field))));
+                        Model associatedModel = manager
+                           .get(String.format("id"), resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
                         field.set(obj, associatedModel);
                      } else {
                         field.set(obj, null);
                      }
                   } else {
-                     if ((field.getType().getSimpleName().equals("int") ||
-                        field.getType().getSimpleName().equals("Integer")) &&
+                     if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                         connection.toString().startsWith("oracle")) {
                         if (resultSet.getObject(TableUtil.getColumnName(field)) == null) {
                            field.set(obj, 0);
@@ -1428,7 +1349,10 @@ public class Manager implements IManager {
                         Object columnValue = resultSet.getObject(columnName);
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           columnValue = new DateTime(timestamp.getTime());
+                           // TODO - Refatoração mudança de jedi.types.DateTime
+                           // para java.util.Date
+                           // columnValue = new DateTime(timestamp.getTime());
+                           columnValue = new Date(timestamp.getTime());
                         }
                         field.set(obj, columnValue);
                      }
@@ -1476,10 +1400,7 @@ public class Manager implements IManager {
                String _sql = sql.toLowerCase();
                // Returns a navigable ResultSet.
                connect();
-               statement = connection.prepareStatement(
-                  sql,
-                  ResultSet.TYPE_SCROLL_SENSITIVE,
-                  ResultSet.CONCUR_READ_ONLY);
+               statement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
                resultSet = statement.executeQuery();
                ResultSetMetaData tableMetadata = null;
                if (resultSet != null) {
@@ -1492,17 +1413,12 @@ public class Manager implements IManager {
                         List<Map<String, Object>> tableRow = new ArrayList<Map<String, Object>>();
                         HashMap<String, Object> tableColumn = new HashMap<String, Object>();
                         for (int i = 1; i <= tableMetadata.getColumnCount(); i++) {
-                           if (_sql.contains("inner join") || _sql.contains("left join") ||
-                              _sql.contains("right join") || _sql.contains("full outer join")) {
-                              key = String.format(
-                                 "%s.%s",
-                                 tableMetadata.getTableName(i),
-                                 tableMetadata.getColumnName(i));
+                           if (_sql.contains("inner join") || _sql.contains("left join") || _sql.contains("right join") ||
+                              _sql.contains("full outer join")) {
+                              key = String.format("%s.%s", tableMetadata.getTableName(i), tableMetadata.getColumnName(i));
                               tableColumn.put(key, resultSet.getObject(key));
                            } else {
-                              tableColumn.put(
-                                 tableMetadata.getColumnLabel(i),
-                                 resultSet.getObject(tableMetadata.getColumnLabel(i)));
+                              tableColumn.put(tableMetadata.getColumnLabel(i), resultSet.getObject(tableMetadata.getColumnLabel(i)));
                            }
                         }
                         tableRow.add(tableColumn);
@@ -1590,9 +1506,8 @@ public class Manager implements IManager {
                      if (ft.equals(FetchType.EAGER)) {
                         Class associatedModelClass = Class.forName(field.getType().getName());
                         manager = new Manager(associatedModelClass);
-                        Model associatedModel = manager.get(
-                           String.format("id"),
-                           rs.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
+                        Model associatedModel = manager
+                           .get(String.format("id"), rs.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
                         field.set(o, associatedModel);
                      } else {
                         field.set(o, null);
@@ -1606,8 +1521,7 @@ public class Manager implements IManager {
                         model = Model.class.getSimpleName().equals(model) ? "" : model;
                         if (model.isEmpty()) {
                            ParameterizedType pt = null; // generic type
-                           if (ParameterizedType.class
-                              .isAssignableFrom(field.getGenericType().getClass())) {
+                           if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                               pt = (ParameterizedType) field.getGenericType();
                               sc = ((Class) (pt.getActualTypeArguments()[0])).getSuperclass();
                               if (sc == Model.class) {
@@ -1625,8 +1539,7 @@ public class Manager implements IManager {
                            }
                         }
                         // Associated model class.
-                        Class amc = Class.forName(
-                           String.format("%s.%s", this.entity.getPackage().getName(), model));
+                        Class amc = Class.forName(String.format("%s.%s", this.entity.getPackage().getName(), model));
                         manager = new Manager(amc);
                         // Associated model record set.
                         List<List<Map<String, Object>>> amrs = null;
@@ -1646,8 +1559,7 @@ public class Manager implements IManager {
                            args = args.replace("}", "");
                            args = args.replace("=", "");
                            args = args.replace(", ", ",");
-                           args = args
-                              .replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
+                           args = args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
                            args = String.format("id__in=[%s]", args);
                            QuerySet qs1 = manager._filter(args);
                            field.set(o, qs1);
@@ -1659,8 +1571,7 @@ public class Manager implements IManager {
                      }
                   } else {
                      // Configura campos que não são instancias de model.
-                     if ((field.getType().getSimpleName().equals("int") ||
-                        field.getType().getSimpleName().equals("Integer")) &&
+                     if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                         connection.toString().startsWith("oracle")) {
                         if (rs.getObject(TableUtil.getColumnName(field)) == null) {
                            field.set(o, 0);
@@ -1674,7 +1585,10 @@ public class Manager implements IManager {
                         Object columnValue = rs.getObject(columnName);
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           columnValue = new DateTime(timestamp.getTime());
+                           // TODO - Refatoração mudança de jedi.types.DateTime
+                           // para java.util.Date
+                           // columnValue = new DateTime(timestamp.getTime());
+                           columnValue = new Date(timestamp.getTime());
                         }
                         field.set(o, columnValue);
                      }
@@ -1723,8 +1637,7 @@ public class Manager implements IManager {
             field = TableUtil.getColumnName(field);
             String sql = "SELECT * FROM";
             if (value != null) {
-               sql =
-                  String.format("%s %s WHERE %s = '%s'", sql, tableName, field, value.toString());
+               sql = String.format("%s %s WHERE %s = '%s'", sql, tableName, field, value.toString());
             } else {
                if (field.equals("id")) {
                   return null;
@@ -1735,8 +1648,7 @@ public class Manager implements IManager {
              * Se o tipo de dado do valor passado é numérico
              * o apóstrofe é retirado.
              */
-            if (Integer.class.isInstance(value) || Float.class.isInstance(value) ||
-               Double.class.isInstance(value)) {
+            if (Integer.class.isInstance(value) || Float.class.isInstance(value) || Double.class.isInstance(value)) {
                sql = sql.replaceAll("\'", "");
             }
             connect();
@@ -1747,8 +1659,7 @@ public class Manager implements IManager {
             resultSet = statement.executeQuery();
             int rowCount = resultSet.last() ? resultSet.getRow() : 0;
             if (rowCount <= 0) {
-               throw new DoesNotExistException(
-                  String.format("%s matching query does not exist.", this.entity.getSimpleName()));
+               throw new DoesNotExistException(String.format("%s matching query does not exist.", this.entity.getSimpleName()));
             } else if (rowCount > 1) {
                throw new MultipleObjectsReturnedException(
                   String.format(
@@ -1792,27 +1703,20 @@ public class Manager implements IManager {
                   String referencedModel = null;
                   String referencedTable = null;
                   if (manyToManyFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
                      if (fetchType.equals(FetchType.EAGER)) {
-                        if (!manyToManyFieldAnnotation
-                           .through()
-                           .getSimpleName()
-                           .equals(Model.class.getSimpleName())) {
+                        if (!manyToManyFieldAnnotation.through().getSimpleName().equals(Model.class.getSimpleName())) {
                            continue;
                         }
                         Class superClazz = null;
                         Class clazz = null;
                         referencedModel = manyToManyFieldAnnotation.model().getSimpleName();
-                        referencedModel = Model.class.getSimpleName().equals(referencedModel) ? ""
-                           : referencedModel;
+                        referencedModel = Model.class.getSimpleName().equals(referencedModel) ? "" : referencedModel;
                         if (referencedModel.isEmpty()) {
                            ParameterizedType genericType = null;
-                           if (ParameterizedType.class
-                              .isAssignableFrom(f.getGenericType().getClass())) {
+                           if (ParameterizedType.class.isAssignableFrom(f.getGenericType().getClass())) {
                               genericType = (ParameterizedType) f.getGenericType();
-                              superClazz = ((Class) (genericType.getActualTypeArguments()[0]))
-                                 .getSuperclass();
+                              superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
                               if (superClazz == Model.class) {
                                  clazz = (Class) genericType.getActualTypeArguments()[0];
                                  referencedModel = clazz.getSimpleName();
@@ -1828,8 +1732,7 @@ public class Manager implements IManager {
                            }
                         }
                         String packageName = this.entity.getPackage().getName();
-                        Class associatedModelClass =
-                           Class.forName(String.format("%s.%s", packageName, referencedModel));
+                        Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, referencedModel));
                         manager = new Manager(associatedModelClass);
                         QuerySet associatedModelsQuerySet = manager.raw(
                            String.format(
@@ -1848,8 +1751,7 @@ public class Manager implements IManager {
                         f.set(model, null);
                      }
                   } else if (foreignKeyFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
                      if (fetchType.equals(FetchType.EAGER)) {
                         // Caso seja recupera a classe do atributo.
                         Class associatedModelClass = Class.forName(f.getType().getName());
@@ -1857,9 +1759,7 @@ public class Manager implements IManager {
                         manager = new Manager(associatedModelClass);
                         // Chamando o método esse método (get)
                         // recursivamente.
-                        Model associatedModel = manager.get(
-                           "id",
-                           resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(f))));
+                        Model associatedModel = manager.get("id", resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(f))));
                         // Atributo (campo) referenciando o modelo anotado
                         // como ForeignKeyField.
                         f.set(model, associatedModel);
@@ -1867,8 +1767,7 @@ public class Manager implements IManager {
                         f.set(model, null);
                      }
                   } else if (oneToOneFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
                      if (fetchType.equals(FetchType.EAGER)) {
                         Class associatedModelClass = Class.forName(f.getType().getName());
                         manager = new Manager(associatedModelClass);
@@ -1882,8 +1781,7 @@ public class Manager implements IManager {
                   } else {
                      // Configurando campos que não são instancias de
                      // Model.
-                     if ((f.getType().getSimpleName().equals("int") ||
-                        f.getType().getSimpleName().equals("Integer")) &&
+                     if ((f.getType().getSimpleName().equals("int") || f.getType().getSimpleName().equals("Integer")) &&
                         connection.toString().startsWith("oracle")) {
                         columnName = TableUtil.getColumnName(f.getName());
                         o = resultSet.getObject(columnName);
@@ -1899,7 +1797,10 @@ public class Manager implements IManager {
                         // Column´s value.
                         o = resultSet.getObject(columnName);
                         if (o instanceof Timestamp) {
-                           o = new DateTime(((Timestamp) o).getTime());
+                           // TODO - Refatoração mudança de jedi.types.DateTime
+                           // para java.util.Date
+                           // o = new DateTime(((Timestamp) o).getTime());
+                           o = new Date(((Timestamp) o).getTime());
                         }
                         f.set(model, o);
                      }
@@ -1929,8 +1830,7 @@ public class Manager implements IManager {
       return model;
    }
    
-   public <T extends Model> T get(String field, Object value)
-      throws ObjectDoesNotExistException, MultipleObjectsReturnedException {
+   public <T extends Model> T get(String field, Object value) throws ObjectDoesNotExistException, MultipleObjectsReturnedException {
       return (T) this.get(field, value, this.entity);
    }
    
@@ -1960,8 +1860,7 @@ public class Manager implements IManager {
             if (fieldLookup.matches("and|or")) {
                _sql.append(String.format(" %s\n", fieldLookup));
             } else {
-               _sql.append(
-                  String.format("    %s", FieldLookup.translate(fieldLookup).get("where").get(0)));
+               _sql.append(String.format("    %s", FieldLookup.translate(fieldLookup).get("where").get(0)));
             }
          }
          String sql = _sql.toString();
@@ -1986,8 +1885,7 @@ public class Manager implements IManager {
                      "Lookup parameters were",
                      _fieldLookups));
             } else {
-               throw new ObjectDoesNotExistException(
-                  String.format("%s matching query does not exist.", this.entity.getSimpleName()));
+               throw new ObjectDoesNotExistException(String.format("%s matching query does not exist.", this.entity.getSimpleName()));
             }
          } catch (SQLException e) {
             e.printStackTrace();
@@ -1996,8 +1894,7 @@ public class Manager implements IManager {
       return model;
    }
    
-   public <T extends Model> T get(String... fieldLookups)
-      throws ObjectDoesNotExistException, MultipleObjectsReturnedException {
+   public <T extends Model> T get(String... fieldLookups) throws ObjectDoesNotExistException, MultipleObjectsReturnedException {
       return (T) get(this.entity, fieldLookups);
    }
    
@@ -2016,11 +1913,9 @@ public class Manager implements IManager {
             // Renomeando o atributo para ficar no mesmo padrão do nome da
             // coluna na tabela associada ao modelo.
             field = TableUtil.getColumnName(field);
-            String sql =
-               String.format("SELECT * FROM %s ORDER BY %s DESC LIMIT 1", tableName, field);
+            String sql = String.format("SELECT * FROM %s ORDER BY %s DESC LIMIT 1", tableName, field);
             if (connection.toString().startsWith("oracle")) {
-               sql = String
-                  .format("SELECT * FROM %s WHERE ROWNUM < 2 ORDER BY %s DESC", tableName, field);
+               sql = String.format("SELECT * FROM %s WHERE ROWNUM < 2 ORDER BY %s DESC", tableName, field);
             }
             connect();
             QuerySet querySet = this.raw(sql, entity);
@@ -2059,11 +1954,9 @@ public class Manager implements IManager {
       field = field == null ? "" : field.trim();
       if (!field.isEmpty()) {
          try {
-            String sql =
-               String.format("SELECT * FROM %s ORDER BY %s ASC LIMIT 1", tableName, field);
+            String sql = String.format("SELECT * FROM %s ORDER BY %s ASC LIMIT 1", tableName, field);
             if (this.connection.toString().startsWith("oracle")) {
-               sql = String
-                  .format("SELECT * FROM %s WHERE ROWNUM < 2 ORDER BY %s ASC", tableName, field);
+               sql = String.format("SELECT * FROM %s WHERE ROWNUM < 2 ORDER BY %s ASC", tableName, field);
             }
             connect();
             QuerySet querySet = this.raw(sql, entity);
@@ -2100,11 +1993,9 @@ public class Manager implements IManager {
     *         livros.id =
     *         livros_autores.livro_id AND livros_autores.autor_id = 1;
     */
-   public <S extends Model, T extends Model> QuerySet<S> getSet(Class<T> associatedModelClass,
-      int id) {
+   public <S extends Model, T extends Model> QuerySet<S> getSet(Class<T> associatedModelClass, int id) {
       QuerySet<S> querySet = new QuerySet<S>();
-      if (associatedModelClass != null &&
-         associatedModelClass.getSuperclass().getName().equals("jedi.db.models.Model")) {
+      if (associatedModelClass != null && associatedModelClass.getSuperclass().getName().equals("jedi.db.models.Model")) {
          String sql = "";
          String tableNameAssociatedModel = TableUtil.getTableName(associatedModelClass);
          ForeignKeyField foreignKeyFieldAnnotation = null;
@@ -2115,10 +2006,7 @@ public class Manager implements IManager {
                String model = foreignKeyFieldAnnotation.model().getSimpleName();
                model = Model.class.getSimpleName().equals(model) ? "" : model;
                if (model.isEmpty()) {
-                  model = field
-                     .getType()
-                     .getName()
-                     .replace(field.getType().getPackage().getName() + ".", "");
+                  model = field.getType().getName().replace(field.getType().getPackage().getName() + ".", "");
                }
                if (model.equals(associatedModelClass.getSimpleName())) {
                   querySet = this._filter(String.format("%s_id=%d", field.getName(), id));
@@ -2188,7 +2076,7 @@ public class Manager implements IManager {
    
    public <T extends Model> T updateOrCreate(String... args) {
       T obj = null;
-//      TODO
+      // TODO
       return obj;
    }
    
@@ -2205,8 +2093,7 @@ public class Manager implements IManager {
          if (values != null && values.length > 0) {
             MessageFormat message = new MessageFormat(criteria);
             for (int i = 0; i < values.length; i++) {
-               if (values[i].getClass() == String.class || values[i].getClass() == Date.class ||
-                  values[i].getClass() == DateTime.class) {
+               if (values[i].getClass() == String.class || values[i].getClass() == Date.class || values[i].getClass() == DateTime.class) {
                   values[i] = String.format("'%s'", values[i]);
                } else {
                   values[i] = String.format("%s", values[i]);
@@ -2221,8 +2108,7 @@ public class Manager implements IManager {
       return qs;
    }
    
-   public <T1 extends Model, T2 extends Model> Manager join(Class<T1> clazz1, Class<T2> clazz2,
-      JoinType type) {
+   public <T1 extends Model, T2 extends Model> Manager join(Class<T1> clazz1, Class<T2> clazz2, JoinType type) {
       if (clazz1 != null && clazz2 != null && type != null) {
          String tb1 = TableUtil.getTableName(clazz1);
          String tb2 = TableUtil.getTableName(clazz2);
@@ -2230,8 +2116,7 @@ public class Manager implements IManager {
          String cols2 = String.format("\t%s.*\n", tb2);
          String from = String.format("from\n\t%s\n", tb1);
          String join = "";
-         String on = String
-            .format("on\n\t%s.id = %s.%s_id;", tb1, tb2, clazz1.getSimpleName().toLowerCase());
+         String on = String.format("on\n\t%s.id = %s.%s_id;", tb1, tb2, clazz1.getSimpleName().toLowerCase());
          StringBuilder sql = new StringBuilder();
          sql.append("select\n");
          sql.append(cols1);
@@ -2281,8 +2166,7 @@ public class Manager implements IManager {
          String tb1 = TableUtil.getTableName(this.entity);
          String tb2 = TableUtil.getTableName(clazz);
          String join = "";
-         String on = String
-            .format("on\n\t%s.id = %s.%s_id", tb1, tb2, this.entity.getSimpleName().toLowerCase());
+         String on = String.format("on\n\t%s.id = %s.%s_id", tb1, tb2, this.entity.getSimpleName().toLowerCase());
          StringBuilder sql = new StringBuilder();
          join = String.format("\ninner join\n\t%s\n", tb2);
          sql.append(join);
@@ -2297,8 +2181,7 @@ public class Manager implements IManager {
          String tb1 = TableUtil.getTableName(this.entity);
          String tb2 = TableUtil.getTableName(clazz);
          String join = "";
-         String on = String
-            .format("on\n\t%s.id = %s.%s_id", tb1, tb2, this.entity.getSimpleName().toLowerCase());
+         String on = String.format("on\n\t%s.id = %s.%s_id", tb1, tb2, this.entity.getSimpleName().toLowerCase());
          StringBuilder sql = new StringBuilder();
          join = String.format("\nleft join\n\t%s\n", tb2);
          sql.append(join);
@@ -2313,8 +2196,7 @@ public class Manager implements IManager {
          String tb1 = TableUtil.getTableName(this.entity);
          String tb2 = TableUtil.getTableName(clazz);
          String join = "";
-         String on = String
-            .format("on\n\t%s.id = %s.%s_id", tb1, tb2, this.entity.getSimpleName().toLowerCase());
+         String on = String.format("on\n\t%s.id = %s.%s_id", tb1, tb2, this.entity.getSimpleName().toLowerCase());
          StringBuilder sql = new StringBuilder();
          join = String.format("\nright join\n\t%s\n", tb2);
          sql.append(join);
@@ -2366,10 +2248,7 @@ public class Manager implements IManager {
             try {
                if (sql.toLowerCase().startsWith("select")) {
                   // Retorna um resultset navegável.
-                  stmt = this.connection.prepareStatement(
-                     sql,
-                     ResultSet.TYPE_SCROLL_SENSITIVE,
-                     ResultSet.CONCUR_READ_ONLY);
+                  stmt = this.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
                   ResultSet rs = stmt.executeQuery();
                   ResultSetMetaData metadata = rs == null ? null : rs.getMetaData();
                   String _sql = sql.toLowerCase();
@@ -2384,8 +2263,7 @@ public class Manager implements IManager {
                         for (int i = 1; i <= metadata.getColumnCount(); i++) {
                            col = metadata.getColumnLabel(i);
                            val = rs.getObject(col);
-                           if (_sql.contains("inner join") || _sql.contains("left outer join") ||
-                              _sql.contains("right outer join") ||
+                           if (_sql.contains("inner join") || _sql.contains("left outer join") || _sql.contains("right outer join") ||
                               _sql.contains("full outer join")) {
                               tb = metadata.getTableName(i);
                               column.put(String.format("%s_%s", tb, col), val);
@@ -2497,11 +2375,7 @@ public class Manager implements IManager {
             Field id = jedi.db.models.Model.class.getDeclaredField("id");
             id.setAccessible(true);
             if (this.connection.toString().startsWith("oracle")) {
-               id.set(
-                  o,
-                  ((java.math.BigDecimal) rs
-                     .getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
-                        .intValue());
+               id.set(o, ((java.math.BigDecimal) rs.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1))).intValue());
             } else {
                id.set(o, rs.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
             }
@@ -2511,8 +2385,7 @@ public class Manager implements IManager {
                if (!JediEngine.isJediField(field)) {
                   continue;
                }
-               if (field.toString().substring(field.toString().lastIndexOf('.') + 1).equals(
-                  "serialVersionUID")) {
+               if (field.toString().substring(field.toString().lastIndexOf('.') + 1).equals("serialVersionUID")) {
                   continue;
                }
                if (field.getName().equalsIgnoreCase("objects")) {
@@ -2533,8 +2406,7 @@ public class Manager implements IManager {
                      Class c = null; // class.
                      if (model.isEmpty()) {
                         ParameterizedType pt = null; // generic type.
-                        if (ParameterizedType.class
-                           .isAssignableFrom(field.getGenericType().getClass())) {
+                        if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                            pt = (ParameterizedType) field.getGenericType();
                            sc = ((Class) (pt.getActualTypeArguments()[0])).getSuperclass();
                            if (sc == Model.class) {
@@ -2577,17 +2449,16 @@ public class Manager implements IManager {
                               ((Model) o).getId()),
                            amc);
                      } else {
-                        qsam = manager
-                           .raw(
-                              String.format(
-                                 "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
-                                 TableUtil.getTableName(references),
-                                 TableUtil.getColumnName(model),
-                                 tableName,
-                                 TableUtil.getTableName(references),
-                                 TableUtil.getColumnName(o.getClass()),
-                                 ((Model) o).getId()),
-                              amc);
+                        qsam = manager.raw(
+                           String.format(
+                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                              TableUtil.getTableName(references),
+                              TableUtil.getColumnName(model),
+                              tableName,
+                              TableUtil.getTableName(references),
+                              TableUtil.getColumnName(o.getClass()),
+                              ((Model) o).getId()),
+                           amc);
                      }
                      field.set(o, qsam);
                   } else {
@@ -2610,8 +2481,7 @@ public class Manager implements IManager {
                      field.set(o, null);
                   }
                } else {
-                  if ((field.getType().getSimpleName().equals("int") ||
-                     field.getType().getSimpleName().equals("Integer")) &&
+                  if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                      this.connection.toString().startsWith("oracle")) {
                      if (rs.getObject(TableUtil.getColumnName(field)) == null) {
                         field.set(o, 0);
@@ -2625,7 +2495,10 @@ public class Manager implements IManager {
                      columnValue = convertZeroDateToNull(columnValue);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        columnValue = new DateTime(timestamp.getTime());
+                        // TODO - Refatoração mudança de jedi.types.DateTime
+                        // para java.util.Date
+                        // columnValue = new DateTime(timestamp.getTime());
+                        columnValue = new Date(timestamp.getTime());
                      }
                      field.set(o, columnValue);
                   }
@@ -2706,11 +2579,7 @@ public class Manager implements IManager {
             Field id = jedi.db.models.Model.class.getDeclaredField("id");
             id.setAccessible(true);
             if (this.connection.toString().startsWith("oracle")) {
-               id.set(
-                  o,
-                  ((java.math.BigDecimal) rs
-                     .getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
-                        .intValue());
+               id.set(o, ((java.math.BigDecimal) rs.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1))).intValue());
             } else {
                id.set(o, rs.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
             }
@@ -2720,8 +2589,7 @@ public class Manager implements IManager {
                if (!JediEngine.isJediField(field)) {
                   continue;
                }
-               if (field.toString().substring(field.toString().lastIndexOf('.') + 1).equals(
-                  "serialVersionUID")) {
+               if (field.toString().substring(field.toString().lastIndexOf('.') + 1).equals("serialVersionUID")) {
                   continue;
                }
                if (field.getName().equalsIgnoreCase("objects")) {
@@ -2742,8 +2610,7 @@ public class Manager implements IManager {
                      Class c = null; // class.
                      if (model.isEmpty()) {
                         ParameterizedType pt = null; // generic type.
-                        if (ParameterizedType.class
-                           .isAssignableFrom(field.getGenericType().getClass())) {
+                        if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                            pt = (ParameterizedType) field.getGenericType();
                            sc = ((Class) (pt.getActualTypeArguments()[0])).getSuperclass();
                            if (sc == Model.class) {
@@ -2786,17 +2653,16 @@ public class Manager implements IManager {
                               ((Model) o).getId()),
                            amc);
                      } else {
-                        qsam = manager
-                           .raw(
-                              String.format(
-                                 "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
-                                 TableUtil.getTableName(references),
-                                 TableUtil.getColumnName(model),
-                                 tableName,
-                                 TableUtil.getTableName(references),
-                                 TableUtil.getColumnName(o.getClass()),
-                                 ((Model) o).getId()),
-                              amc);
+                        qsam = manager.raw(
+                           String.format(
+                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                              TableUtil.getTableName(references),
+                              TableUtil.getColumnName(model),
+                              tableName,
+                              TableUtil.getTableName(references),
+                              TableUtil.getColumnName(o.getClass()),
+                              ((Model) o).getId()),
+                           amc);
                      }
                      field.set(o, qsam);
                   } else {
@@ -2819,8 +2685,7 @@ public class Manager implements IManager {
                      field.set(o, null);
                   }
                } else {
-                  if ((field.getType().getSimpleName().equals("int") ||
-                     field.getType().getSimpleName().equals("Integer")) &&
+                  if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                      this.connection.toString().startsWith("oracle")) {
                      if (rs.getObject(TableUtil.getColumnName(field)) == null) {
                         field.set(o, 0);
@@ -2834,7 +2699,10 @@ public class Manager implements IManager {
                      columnValue = convertZeroDateToNull(columnValue);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        columnValue = new DateTime(timestamp.getTime());
+                        // TODO - Refatoração mudança de jedi.types.DateTime
+                        // para java.util.Date
+                        // columnValue = new DateTime(timestamp.getTime());
+                        columnValue = new Date(timestamp.getTime());
                      }
                      field.set(o, columnValue);
                   }
@@ -2921,16 +2789,16 @@ public class Manager implements IManager {
       return !connected();
    }
    
-//   private Connection connect() {
-//      if (JediEngine.Pool.isNotActive()) {
-//         if (disconnected()) {
-//            connection = DataSource.getConnection();
-//         }
-//      } else {
-//         connection = DataSource.getConnection();
-//      }
-//      return connection;
-//   }
+   // private Connection connect() {
+   // if (JediEngine.Pool.isNotActive()) {
+   // if (disconnected()) {
+   // connection = DataSource.getConnection();
+   // }
+   // } else {
+   // connection = DataSource.getConnection();
+   // }
+   // return connection;
+   // }
    
    private Connection connect() {
       if (disconnected()) {
@@ -3014,10 +2882,7 @@ public class Manager implements IManager {
             }
             try {
                if (sql.toLowerCase().startsWith("select")) {
-                  stmt = connection.prepareStatement(
-                     sql,
-                     ResultSet.TYPE_SCROLL_SENSITIVE,
-                     ResultSet.CONCUR_READ_ONLY);
+                  stmt = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
                   rs = stmt.executeQuery();
                   qs = JediEngine.convert(rs, clazz);
                } else {
@@ -3041,8 +2906,7 @@ public class Manager implements IManager {
    @Override
    public <T extends Model> IManager delete(Integer... id) {
       if (id != null) {
-         String sql =
-            String.format("delete from %s where id in %s", tableName, Arrays.toString(id));
+         String sql = String.format("delete from %s where id in %s", tableName, Arrays.toString(id));
          sql = sql.replace("[", "(");
          sql = sql.replace("]", ")");
          this.run(sql);
@@ -3080,14 +2944,8 @@ public class Manager implements IManager {
    public <T extends Model> QuerySet<T> paginate(Integer limit, Integer offset, String where) {
       limit = limit == null ? 0 : limit;
       offset = offset == null ? 0 : offset;
-      where =
-         where == null || where.trim().isEmpty() ? "" : String.format(" where %s", where.trim());
-      String sql = String.format(
-         "select * from %s%s order by id asc limit %d offset %d",
-         this.getTableName(),
-         where,
-         limit,
-         offset);
+      where = where == null || where.trim().isEmpty() ? "" : String.format(" where %s", where.trim());
+      String sql = String.format("select * from %s%s order by id asc limit %d offset %d", this.getTableName(), where, limit, offset);
       return this.run(sql);
    }
    
@@ -3114,8 +2972,7 @@ public class Manager implements IManager {
     * 3 - ordenação.
     * 4 - filtro da pesquisa.
     */
-   private <T extends Model> QuerySet<T> _page(Integer first, Integer pageSize, boolean reverseOrder,
-      String... conditions) {
+   private <T extends Model> QuerySet<T> _page(Integer first, Integer pageSize, boolean reverseOrder, String... conditions) {
       first = first == null ? 0 : first;
       pageSize = pageSize == null ? 0 : pageSize;
       String orderBy = reverseOrder == false ? "ORDER BY id ASC" : "ORDER BY id DESC";
@@ -3160,18 +3017,12 @@ public class Manager implements IManager {
             conditions[i] = conditions[i].replace(",", ", ");
             // Checks if the current pair contains __startswith, __contains
             // or __endswith.
-            if (conditions[i].indexOf("__startswith") > -1 ||
-               conditions[i].indexOf("__!startswith") > -1 ||
-               conditions[i].indexOf("__istartswith") > -1 ||
-               conditions[i].indexOf("__!istartswith") > -1 ||
-               conditions[i].indexOf("__contains") > -1 ||
-               conditions[i].indexOf("__!contains") > -1 ||
-               conditions[i].indexOf("__icontains") > -1 ||
-               conditions[i].indexOf("__!icontains") > -1 ||
-               conditions[i].indexOf("__endswith") > -1 ||
-               conditions[i].indexOf("__!endswith") > -1 ||
-               conditions[i].indexOf("__iendswith") > -1 ||
-               conditions[i].indexOf("__!iendswith") > -1) {
+            if (conditions[i].indexOf("__startswith") > -1 || conditions[i].indexOf("__!startswith") > -1 ||
+               conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
+               conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
+               conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
+               conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
+               conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
                // Creates the LIKE SQL statement.
                if (conditions[i].indexOf("__startswith") > -1) {
                   conditions[i] = conditions[i].replace("__startswith = ", " LIKE ");
@@ -3184,13 +3035,11 @@ public class Manager implements IManager {
                   conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                   conditions[i] = conditions[i] + "%\'";
                } else if (conditions[i].indexOf("__istartswith") > -1) {
-                  conditions[i] = conditions[i]
-                     .replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                  conditions[i] = conditions[i].replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                   conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                   conditions[i] = conditions[i] + "%\')";
                } else if (conditions[i].indexOf("__!istartswith") > -1) {
-                  conditions[i] = conditions[i]
-                     .replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                  conditions[i] = conditions[i].replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                   conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                   conditions[i] = conditions[i] + "%\')";
                } else if (conditions[i].indexOf("__contains") > -1) {
@@ -3206,14 +3055,12 @@ public class Manager implements IManager {
                   conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                   conditions[i] = conditions[i] + "%\'";
                } else if (conditions[i].indexOf("__icontains") > -1) {
-                  conditions[i] = conditions[i]
-                     .replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                  conditions[i] = conditions[i].replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                   conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                   conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                   conditions[i] = conditions[i] + "%\')";
                } else if (conditions[i].indexOf("__!icontains") > -1) {
-                  conditions[i] = conditions[i]
-                     .replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                  conditions[i] = conditions[i].replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                   conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                   conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                   conditions[i] = conditions[i] + "%\')";
@@ -3226,13 +3073,11 @@ public class Manager implements IManager {
                   // Replaces 'value' by '%value'.
                   conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                } else if (conditions[i].indexOf("__iendswith") > -1) {
-                  conditions[i] = conditions[i]
-                     .replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                  conditions[i] = conditions[i].replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                   // Replaces 'value' by '%value'.
                   conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                } else if (conditions[i].indexOf("__!iendswith") > -1) {
-                  conditions[i] = conditions[i]
-                     .replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                  conditions[i] = conditions[i].replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                   // Replaces 'value' by '%value'.
                   conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                } else {
@@ -3302,9 +3147,7 @@ public class Manager implements IManager {
                conditions[i] = conditions[i].replace("__!exact = ", " != ");
             }
             if (conditions[i].indexOf("__isnull") > -1) {
-               String bool = conditions[i]
-                  .substring(conditions[i].indexOf("=") + 1, conditions[i].length())
-                  .trim();
+               String bool = conditions[i].substring(conditions[i].indexOf("=") + 1, conditions[i].length()).trim();
                if (bool.equalsIgnoreCase("true")) {
                   conditions[i] = conditions[i].replace("__isnull = ", " IS NULL ");
                }
@@ -3340,9 +3183,7 @@ public class Manager implements IManager {
                Field id = jedi.db.models.Model.class.getDeclaredField("id");
                id.setAccessible(true);
                if (this.connection.toString().startsWith("oracle")) {
-                  id.set(
-                     obj,
-                     ((java.math.BigDecimal) resultSet.getObject(id.getName())).intValue());
+                  id.set(obj, ((java.math.BigDecimal) resultSet.getObject(id.getName())).intValue());
                } else {
                   id.set(obj, resultSet.getObject(id.getName()));
                }
@@ -3361,8 +3202,7 @@ public class Manager implements IManager {
                FetchType fetchType = JediEngine.FETCH_TYPE;
                Manager manager = null;
                if (manyToManyFieldAnnotation != null) {
-                  fetchType = fetchType.equals(FetchType.NONE)
-                     ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                  fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
                   if (fetchType.equals(FetchType.EAGER)) {
                      Class superClazz = null;
                      Class clazz = null;
@@ -3371,11 +3211,9 @@ public class Manager implements IManager {
                      model = Model.class.getSimpleName().equals(model) ? "" : model;
                      if (model.isEmpty()) {
                         ParameterizedType genericType = null;
-                        if (ParameterizedType.class
-                           .isAssignableFrom(field.getGenericType().getClass())) {
+                        if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                            genericType = (ParameterizedType) field.getGenericType();
-                           superClazz =
-                              ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
+                           superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
                            if (superClazz == Model.class) {
                               clazz = (Class) genericType.getActualTypeArguments()[0];
                               model = clazz.getSimpleName();
@@ -3390,8 +3228,7 @@ public class Manager implements IManager {
                            references = TableUtil.getTableName(model);
                         }
                      }
-                     Class associatedModelClass =
-                        Class.forName(String.format("%s.%s", packageName, model));
+                     Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, model));
                      manager = new Manager(associatedModelClass);
                      List<List<Map<String, Object>>> recordSet = null;
                      recordSet = manager.raw(
@@ -3409,8 +3246,7 @@ public class Manager implements IManager {
                      args = args.replace("}", "");
                      args = args.replace("=", "");
                      args = args.replace(", ", ",");
-                     args =
-                        args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
+                     args = args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
                      args = String.format("id__in=[%s]", args);
                      QuerySet querySetAssociatedModels = manager._filter(args);
                      field.set(obj, querySetAssociatedModels);
@@ -3419,11 +3255,9 @@ public class Manager implements IManager {
                   }
                } else if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
                   if (oneToOneFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
                   } else {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
                   }
                   if (fetchType.equals(FetchType.EAGER)) {
                      Class associatedModelClass = Class.forName(field.getType().getName());
@@ -3436,8 +3270,7 @@ public class Manager implements IManager {
                      field.set(obj, null);
                   }
                } else {
-                  if ((field.getType().getSimpleName().equals("int") ||
-                     field.getType().getSimpleName().equals("Integer")) &&
+                  if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                      this.connection.toString().startsWith("oracle")) {
                      if (resultSet.getObject(TableUtil.getColumnName(field.getName())) == null) {
                         field.set(obj, 0);
@@ -3451,7 +3284,10 @@ public class Manager implements IManager {
                      Object columnValue = resultSet.getObject(columnName);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        columnValue = new DateTime(timestamp.getTime());
+                        // TODO - Refatoração mudança de jedi.types.DateTime
+                        // para java.util.Date
+                        // columnValue = new DateTime(timestamp.getTime());
+                        columnValue = new Date(timestamp.getTime());
                      }
                      field.set(obj, columnValue);
                   }
@@ -3475,8 +3311,7 @@ public class Manager implements IManager {
       return querySet;
    }
    
-   public <T extends Model> QuerySet<T> _page(Integer first, Integer pageSize,
-      String... conditions) {
+   public <T extends Model> QuerySet<T> _page(Integer first, Integer pageSize, String... conditions) {
       return _page(first, pageSize, false, conditions);
    }
    
@@ -3484,8 +3319,7 @@ public class Manager implements IManager {
       return _page(first, pageSize, false, (String[]) null);
    }
    
-   public <T extends Model> QuerySet<T> _reversePage(Integer first, Integer pageSize,
-      String... conditions) {
+   public <T extends Model> QuerySet<T> _reversePage(Integer first, Integer pageSize, String... conditions) {
       return _page(first, pageSize, true, conditions);
    }
    
@@ -3516,7 +3350,8 @@ public class Manager implements IManager {
       return joins;
    }
    
-   // TODO - tornar fields como um array de Object de forma que ao ser passado um Model
+   // TODO - tornar fields como um array de Object de forma que ao ser passado
+   // um Model
    // TODO - seja feito uma consulta join.
    public <T extends Model> QuerySet<T> filter(Class<T> modelClass, String... fields) {
       QuerySet<T> querySet = new QuerySet<T>();
@@ -3555,8 +3390,7 @@ public class Manager implements IManager {
                String[] decomposedEl = FieldLookup.decompose(fields[i]);
                if (decomposedEl.length > 0) {
                   Field associationField = JediEngine.getField(decomposedEl[0], entity);
-                  if (JediEngine.isOneToOneField(associationField) ||
-                     JediEngine.isForeignKeyField(associationField)) {
+                  if (JediEngine.isOneToOneField(associationField) || JediEngine.isForeignKeyField(associationField)) {
                      fields[i] = fields[i].replace(decomposedEl[0], decomposedEl[0] + "_id");
                   }
                }
@@ -3576,13 +3410,10 @@ public class Manager implements IManager {
                fields[i] = fields[i].replace(",", ", ");
                // Checks if the current pair contains __startswith, __contains
                // or __endswith.
-               if (fields[i].indexOf("__startswith") > -1 ||
-                  fields[i].indexOf("__!startswith") > -1 ||
-                  fields[i].indexOf("__istartswith") > -1 ||
-                  fields[i].indexOf("__!istartswith") > -1 ||
-                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__icontains") > -1 ||
-                  fields[i].indexOf("__!contains") > -1 || fields[i].indexOf("__!icontains") > -1 ||
-                  fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
+               if (fields[i].indexOf("__startswith") > -1 || fields[i].indexOf("__!startswith") > -1 ||
+                  fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
+                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__icontains") > -1 || fields[i].indexOf("__!contains") > -1 ||
+                  fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
                   fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
                   // Creates a LIKE statement in SQL.
                   if (fields[i].indexOf("__startswith") > -1) {
@@ -3596,8 +3427,7 @@ public class Manager implements IManager {
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\'";
                   } else if (fields[i].indexOf("__istartswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__!istartswith") > -1) {
@@ -3617,14 +3447,12 @@ public class Manager implements IManager {
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\'";
                   } else if (fields[i].indexOf("__icontains") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__!icontains") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
@@ -3633,8 +3461,7 @@ public class Manager implements IManager {
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__iendswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__!endswith") > -1) {
@@ -3642,8 +3469,7 @@ public class Manager implements IManager {
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__!iendswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   }
@@ -4095,8 +3921,7 @@ public class Manager implements IManager {
                   fields[i] = fields[i].replace("__!exact = ", " != ");
                }
                if (fields[i].indexOf("__isnull") > -1) {
-                  String bool =
-                     fields[i].substring(fields[i].indexOf("=") + 1, fields[i].length()).trim();
+                  String bool = fields[i].substring(fields[i].indexOf("=") + 1, fields[i].length()).trim();
                   if (bool.equalsIgnoreCase("true")) {
                      fields[i] = fields[i].replace("__isnull = ", " IS NULL ");
                   }
@@ -4114,12 +3939,7 @@ public class Manager implements IManager {
             if (joins.isEmpty()) {
                sql = String.format("%s %s", sql, where);
             } else {
-               sql = String.format(
-                  format,
-                  tableName,
-                  entityName,
-                  joins,
-                  where.isEmpty() ? "" : "WHERE\n\t" + where);
+               sql = String.format(format, tableName, entityName, joins, where.isEmpty() ? "" : "WHERE\n\t" + where);
                // controla o grau de identação da instrução SQL.
                sql = sql.replaceAll("\t", "    ");
             }
@@ -4143,9 +3963,7 @@ public class Manager implements IManager {
                   Field id = jedi.db.models.Model.class.getDeclaredField("id");
                   id.setAccessible(true);
                   if (connection.toString().startsWith("oracle")) {
-                     id.set(
-                        obj,
-                        ((java.math.BigDecimal) resultSet.getObject(id.getName())).intValue());
+                     id.set(obj, ((java.math.BigDecimal) resultSet.getObject(id.getName())).intValue());
                   } else {
                      id.set(obj, resultSet.getObject(id.getName()));
                   }
@@ -4171,8 +3989,7 @@ public class Manager implements IManager {
                   FetchType fetchType = JediEngine.FETCH_TYPE;
                   Manager manager = null;
                   if (manyToManyFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
                      if (fetchType.equals(FetchType.EAGER)) {
                         Class superClazz = null;
                         Class clazz = null;
@@ -4181,11 +3998,9 @@ public class Manager implements IManager {
                         model = Model.class.getSimpleName().equals(model) ? "" : model;
                         if (model.isEmpty()) {
                            ParameterizedType genericType = null;
-                           if (ParameterizedType.class
-                              .isAssignableFrom(field.getGenericType().getClass())) {
+                           if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                               genericType = (ParameterizedType) field.getGenericType();
-                              superClazz = ((Class) (genericType.getActualTypeArguments()[0]))
-                                 .getSuperclass();
+                              superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
                               if (superClazz == Model.class) {
                                  clazz = (Class) genericType.getActualTypeArguments()[0];
                                  model = clazz.getSimpleName();
@@ -4200,8 +4015,7 @@ public class Manager implements IManager {
                               references = TableUtil.getTableName(model);
                            }
                         }
-                        Class associatedModelClass =
-                           Class.forName(String.format("%s.%s", packageName, model));
+                        Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, model));
                         manager = new Manager(associatedModelClass);
                         List<List<Map<String, Object>>> recordSet = null;
                         // Performs a SQL query.
@@ -4220,8 +4034,7 @@ public class Manager implements IManager {
                         args = args.replace("}", "");
                         args = args.replace("=", "");
                         args = args.replace(", ", ",");
-                        args =
-                           args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
+                        args = args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
                         args = String.format("id__in=[%s]", args);
                         QuerySet querySetAssociatedModels = manager._filter(args);
                         field.set(obj, querySetAssociatedModels);
@@ -4230,11 +4043,9 @@ public class Manager implements IManager {
                      }
                   } else if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
                      if (oneToOneFieldAnnotation != null) {
-                        fetchType = fetchType.equals(FetchType.NONE)
-                           ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                        fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
                      } else {
-                        fetchType = fetchType.equals(FetchType.NONE)
-                           ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                        fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
                      }
                      if (fetchType.equals(FetchType.EAGER)) {
                         // If it's recovers the field's class.
@@ -4253,8 +4064,7 @@ public class Manager implements IManager {
                      }
                   } else {
                      // Sets fields the aren't Model's instances.
-                     if ((field.getType().getSimpleName().equals("int") ||
-                        field.getType().getSimpleName().equals("Integer")) &&
+                     if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                         connection.toString().startsWith("oracle")) {
                         if (resultSet.getObject(TableUtil.getColumnName(field.getName())) == null) {
                            field.set(obj, 0);
@@ -4268,7 +4078,10 @@ public class Manager implements IManager {
                         Object columnValue = resultSet.getObject(columnName);
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           columnValue = new DateTime(timestamp.getTime());
+                           // TODO - Refatoração mudança de jedi.types.DateTime
+                           // para java.util.Date
+                           // columnValue = new DateTime(timestamp.getTime());
+                           columnValue = new Date(timestamp.getTime());
                         }
                         field.set(obj, columnValue);
                      }
@@ -4314,8 +4127,7 @@ public class Manager implements IManager {
                   join = FieldLookup.translateJoin(entityName + "." + conditions[i]);
                   if (!joins.contains(join)) {
                      joins += join;
-                     conditions[i] =
-                        conditions[i].replace(conditions[i].replaceAll("\\w+\\.\\w+__.*", ""), "");
+                     conditions[i] = conditions[i].replace(conditions[i].replaceAll("\\w+\\.\\w+__.*", ""), "");
                   }
                   if (conditions[i].equalsIgnoreCase("AND")) {
                      conditions[i] = "AND";
@@ -4326,10 +4138,8 @@ public class Manager implements IManager {
                   String[] decomposedEl = FieldLookup.decompose(conditions[i]);
                   if (decomposedEl.length > 0) {
                      Field associationField = JediEngine.getField(decomposedEl[0], entity);
-                     if (JediEngine.isOneToOneField(associationField) ||
-                        JediEngine.isForeignKeyField(associationField)) {
-                        conditions[i] =
-                           conditions[i].replace(decomposedEl[0], decomposedEl[0] + "_id");
+                     if (JediEngine.isOneToOneField(associationField) || JediEngine.isForeignKeyField(associationField)) {
+                        conditions[i] = conditions[i].replace(decomposedEl[0], decomposedEl[0] + "_id");
                      }
                   }
                   /*
@@ -4339,8 +4149,7 @@ public class Manager implements IManager {
                   if (conditions[i].contains("=")) {
                      String fieldName = conditions[i].substring(0, conditions[i].lastIndexOf("="));
                      String fieldValue = conditions[i].substring(conditions[i].lastIndexOf("="));
-                     conditions[i] =
-                        String.format("%s%s", TableUtil.getColumnName(fieldName), fieldValue);
+                     conditions[i] = String.format("%s%s", TableUtil.getColumnName(fieldName), fieldValue);
                   }
                   // Adds a blank space between the field's name and value.
                   conditions[i] = conditions[i].replace("=", " = ");
@@ -4351,18 +4160,12 @@ public class Manager implements IManager {
                   conditions[i] = conditions[i].replace(",", ", ");
                   // Checks if the current pair contains __startswith,
                   // __contains or __endswith.
-                  if (conditions[i].indexOf("__startswith") > -1 ||
-                     conditions[i].indexOf("__!startswith") > -1 ||
-                     conditions[i].indexOf("__istartswith") > -1 ||
-                     conditions[i].indexOf("__!istartswith") > -1 ||
-                     conditions[i].indexOf("__contains") > -1 ||
-                     conditions[i].indexOf("__!contains") > -1 ||
-                     conditions[i].indexOf("__icontains") > -1 ||
-                     conditions[i].indexOf("__!icontains") > -1 ||
-                     conditions[i].indexOf("__endswith") > -1 ||
-                     conditions[i].indexOf("__!endswith") > -1 ||
-                     conditions[i].indexOf("__iendswith") > -1 ||
-                     conditions[i].indexOf("__!iendswith") > -1) {
+                  if (conditions[i].indexOf("__startswith") > -1 || conditions[i].indexOf("__!startswith") > -1 ||
+                     conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
+                     conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
+                     conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
+                     conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
+                     conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
                      // Creates the LIKE SQL statement.
                      if (conditions[i].indexOf("__startswith") > -1) {
                         conditions[i] = conditions[i].replace("__startswith = ", " LIKE ");
@@ -4375,14 +4178,11 @@ public class Manager implements IManager {
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\'";
                      } else if (conditions[i].indexOf("__istartswith") > -1) {
-                        conditions[i] = conditions[i]
-                           .replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\')";
                      } else if (conditions[i].indexOf("__!istartswith") > -1) {
-                        conditions[i] = conditions[i].replaceAll(
-                           "^(.*)__!istartswith *= *(.*)$",
-                           "UPPER($1) NOT LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\')";
                      } else if (conditions[i].indexOf("__contains") > -1) {
@@ -4398,15 +4198,12 @@ public class Manager implements IManager {
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\'";
                      } else if (conditions[i].indexOf("__icontains") > -1) {
-                        conditions[i] = conditions[i]
-                           .replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\')";
                      } else if (conditions[i].indexOf("__!icontains") > -1) {
-                        conditions[i] = conditions[i].replaceAll(
-                           "^(.*)__!icontains *= *(.*)$",
-                           "UPPER($1) NOT LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                         conditions[i] = conditions[i].substring(0, conditions[i].lastIndexOf("\'"));
                         conditions[i] = conditions[i] + "%\')";
@@ -4419,14 +4216,11 @@ public class Manager implements IManager {
                         // Replaces 'value' by '%value'.
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                      } else if (conditions[i].indexOf("__iendswith") > -1) {
-                        conditions[i] = conditions[i]
-                           .replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                         // Replaces 'value' by '%value'.
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                      } else if (conditions[i].indexOf("__!iendswith") > -1) {
-                        conditions[i] = conditions[i].replaceAll(
-                           "^(.*)__!iendswith *= *(.*)$",
-                           "UPPER($1) NOT LIKE UPPER($2)");
+                        conditions[i] = conditions[i].replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                         // Replaces 'value' by '%value'.
                         conditions[i] = conditions[i].replaceFirst("\'", "\'%");
                      } else {
@@ -4850,29 +4644,25 @@ public class Manager implements IManager {
                      conditions[i] = conditions[i].replace("__lt = ", " < ");
                   }
                   if (conditions[i].indexOf("__!lt") > -1) {
-                     conditions[i] =
-                        conditions[i].replaceAll("^(.*)__!lt *= *(.*)$", "NOT $1 < $2");
+                     conditions[i] = conditions[i].replaceAll("^(.*)__!lt *= *(.*)$", "NOT $1 < $2");
                   }
                   if (conditions[i].indexOf("__lte") > -1) {
                      conditions[i] = conditions[i].replace("__lte = ", " <= ");
                   }
                   if (conditions[i].indexOf("__!lte") > -1) {
-                     conditions[i] =
-                        conditions[i].replaceAll("^(.*)__!lte *= *(.*)$", "NOT $1 <= $2");
+                     conditions[i] = conditions[i].replaceAll("^(.*)__!lte *= *(.*)$", "NOT $1 <= $2");
                   }
                   if (conditions[i].indexOf("__gt") > -1) {
                      conditions[i] = conditions[i].replace("__gt = ", " > ");
                   }
                   if (conditions[i].indexOf("__!gt") > -1) {
-                     conditions[i] =
-                        conditions[i].replaceAll("^(.*)__!gt *= *(.*)$", "NOT $1 > $2");
+                     conditions[i] = conditions[i].replaceAll("^(.*)__!gt *= *(.*)$", "NOT $1 > $2");
                   }
                   if (conditions[i].indexOf("__gte") > -1) {
                      conditions[i] = conditions[i].replace("__gte = ", " >= ");
                   }
                   if (conditions[i].indexOf("__!gte") > -1) {
-                     conditions[i] =
-                        conditions[i].replaceAll("^(.*)__!gte *= *(.*)$", "NOT $1 >= $2");
+                     conditions[i] = conditions[i].replaceAll("^(.*)__!gte *= *(.*)$", "NOT $1 >= $2");
                   }
                   if (conditions[i].indexOf("__exact") > -1) {
                      conditions[i] = conditions[i].replace("__exact = ", " = ");
@@ -4881,9 +4671,7 @@ public class Manager implements IManager {
                      conditions[i] = conditions[i].replace("__!exact = ", " != ");
                   }
                   if (conditions[i].indexOf("__isnull") > -1) {
-                     String bool = conditions[i]
-                        .substring(conditions[i].indexOf("=") + 1, conditions[i].length())
-                        .trim();
+                     String bool = conditions[i].substring(conditions[i].indexOf("=") + 1, conditions[i].length()).trim();
                      if (bool.equalsIgnoreCase("true")) {
                         conditions[i] = conditions[i].replace("__isnull = ", " IS NULL ");
                      }
@@ -4973,8 +4761,7 @@ public class Manager implements IManager {
                String[] decomposedEl = FieldLookup.decompose(fields[i]);
                if (decomposedEl.length > 0) {
                   Field associationField = JediEngine.getField(decomposedEl[0], entity);
-                  if (JediEngine.isOneToOneField(associationField) ||
-                     JediEngine.isForeignKeyField(associationField)) {
+                  if (JediEngine.isOneToOneField(associationField) || JediEngine.isForeignKeyField(associationField)) {
                      fields[i] = fields[i].replace(decomposedEl[0], decomposedEl[0] + "_id");
                   }
                }
@@ -4994,13 +4781,10 @@ public class Manager implements IManager {
                fields[i] = fields[i].replace(",", ", ");
                // Checks if the current pair contains __startswith, __contains
                // ou __endswith.
-               if (fields[i].indexOf("__startswith") > -1 ||
-                  fields[i].indexOf("__!startswith") > -1 ||
-                  fields[i].indexOf("__istartswith") > -1 ||
-                  fields[i].indexOf("__!istartswith") > -1 ||
-                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__!contains") > -1 ||
-                  fields[i].indexOf("__icontains") > -1 || fields[i].indexOf("__!icontains") > -1 ||
-                  fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
+               if (fields[i].indexOf("__startswith") > -1 || fields[i].indexOf("__!startswith") > -1 ||
+                  fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
+                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__!contains") > -1 || fields[i].indexOf("__icontains") > -1 ||
+                  fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
                   fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
                   // Creates a LIKE SQL statement.
                   if (fields[i].indexOf("__startswith") > -1) {
@@ -5014,14 +4798,11 @@ public class Manager implements IManager {
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\'";
                   } else if (fields[i].indexOf("__istartswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__!istartswith") > -1) {
-                     fields[i] = fields[i].replaceAll(
-                        "^(.*)__!istartswith *= *(.*)$",
-                        "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__contains") > -1) {
@@ -5037,14 +4818,12 @@ public class Manager implements IManager {
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\'";
                   } else if (fields[i].indexOf("__icontains") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
                   } else if (fields[i].indexOf("__!icontains") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                      fields[i] = fields[i].substring(0, fields[i].lastIndexOf("\'"));
                      fields[i] = fields[i] + "%\')";
@@ -5053,8 +4832,7 @@ public class Manager implements IManager {
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__iendswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__!endswith") > -1) {
@@ -5062,8 +4840,7 @@ public class Manager implements IManager {
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else if (fields[i].indexOf("__!iendswith") > -1) {
-                     fields[i] = fields[i]
-                        .replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                     fields[i] = fields[i].replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                      // Replaces 'value' by '%value'.
                      fields[i] = fields[i].replaceFirst("\'", "\'%");
                   } else {
@@ -5519,8 +5296,7 @@ public class Manager implements IManager {
                   fields[i] = fields[i].replace("__!exact = ", " != ");
                }
                if (fields[i].indexOf("__isnull") > -1) {
-                  String bool =
-                     fields[i].substring(fields[i].indexOf("=") + 1, fields[i].length()).trim();
+                  String bool = fields[i].substring(fields[i].indexOf("=") + 1, fields[i].length()).trim();
                   if (bool.equalsIgnoreCase("true")) {
                      fields[i] = fields[i].replace("__isnull = ", " IS NULL ");
                   }
@@ -5537,12 +5313,7 @@ public class Manager implements IManager {
             if (joins.isEmpty()) {
                sql = String.format("%s NOT (%s)", sql, where.trim());
             } else {
-               sql = String.format(
-                  format,
-                  tableName,
-                  entityName,
-                  joins,
-                  where.isEmpty() ? "" : "WHERE\n\tNOT (" + where.trim() + ")");
+               sql = String.format(format, tableName, entityName, joins, where.isEmpty() ? "" : "WHERE\n\tNOT (" + where.trim() + ")");
                sql = sql.replaceAll("\t", "    ");
             }
             String _sql = likeDateTime(sql);
@@ -5567,14 +5338,10 @@ public class Manager implements IManager {
                   if (connection.toString().startsWith("oracle")) {
                      id.set(
                         obj,
-                        ((java.math.BigDecimal) resultSet
-                           .getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
-                              .intValue());
+                        ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
+                           .intValue());
                   } else {
-                     id.set(
-                        obj,
-                        resultSet
-                           .getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
+                     id.set(obj, resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
                   }
                }
                List<Field> _fields = JediEngine.getAllFields(this.entity);
@@ -5595,8 +5362,7 @@ public class Manager implements IManager {
                   FetchType fetchType = JediEngine.FETCH_TYPE;
                   Manager manager = null;
                   if (manyToManyFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
                      if (fetchType.equals(FetchType.EAGER)) {
                         Class superClazz = null;
                         Class clazz = null;
@@ -5604,11 +5370,9 @@ public class Manager implements IManager {
                         model = Model.class.getSimpleName().equals(model) ? "" : model;
                         if (model.isEmpty()) {
                            ParameterizedType genericType = null;
-                           if (ParameterizedType.class
-                              .isAssignableFrom(field.getGenericType().getClass())) {
+                           if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                               genericType = (ParameterizedType) field.getGenericType();
-                              superClazz = ((Class) (genericType.getActualTypeArguments()[0]))
-                                 .getSuperclass();
+                              superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
                               if (superClazz == Model.class) {
                                  clazz = (Class) genericType.getActualTypeArguments()[0];
                                  model = clazz.getSimpleName();
@@ -5624,8 +5388,7 @@ public class Manager implements IManager {
                            }
                         }
                         String packageName = this.entity.getPackage().getName();
-                        Class associatedModelClass =
-                           Class.forName(String.format("%s.%s", packageName, model));
+                        Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, model));
                         manager = new Manager(associatedModelClass);
                         QuerySet querySetAssociatedModels = manager.raw(
                            String.format(
@@ -5643,26 +5406,21 @@ public class Manager implements IManager {
                      }
                   } else if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
                      if (oneToOneFieldAnnotation != null) {
-                        fetchType = fetchType.equals(FetchType.NONE)
-                           ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                        fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
                      } else {
-                        fetchType = fetchType.equals(FetchType.NONE)
-                           ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                        fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
                      }
                      if (fetchType.equals(FetchType.EAGER)) {
                         Class associatedModelClass = Class.forName(field.getType().getName());
                         manager = new Manager(associatedModelClass);
-                        Model associatedModel = manager.get(
-                           String.format("id"),
-                           resultSet
-                              .getObject(String.format("%s_id", TableUtil.getColumnName(field))));
+                        Model associatedModel = manager
+                           .get(String.format("id"), resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
                         field.set(obj, associatedModel);
                      } else {
                         field.set(obj, null);
                      }
                   } else {
-                     if ((field.getType().getSimpleName().equals("int") ||
-                        field.getType().getSimpleName().equals("Integer")) &&
+                     if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                         connection.toString().startsWith("oracle")) {
                         if (resultSet.getObject(TableUtil.getColumnName(field)) == null) {
                            field.set(obj, 0);
@@ -5676,7 +5434,10 @@ public class Manager implements IManager {
                         Object columnValue = resultSet.getObject(columnName);
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           columnValue = new DateTime(timestamp.getTime());
+                           // TODO - Refatoração mudança de jedi.types.DateTime
+                           // para java.util.Date
+                           // columnValue = new DateTime(timestamp.getTime());
+                           columnValue = new Date(timestamp.getTime());
                         }
                         field.set(obj, columnValue);
                      }
@@ -5697,7 +5458,8 @@ public class Manager implements IManager {
       return querySet;
    }
    
-   public <T extends Model> QuerySet<T> page(QueryPageStart pageStart, QueryPageSize pageSize, QueryPageOrder pageOrder, String... filters) {
+   public <T extends Model> QuerySet<T> page(QueryPageStart pageStart, QueryPageSize pageSize, QueryPageOrder pageOrder,
+      String... filters) {
       Integer _pageStart = pageStart == null ? 0 : pageStart.get();
       Integer _pageSize = pageSize == null ? 0 : pageSize.get();
       boolean reverseOrder = SortOrder.isDescending(pageOrder);
@@ -5726,8 +5488,7 @@ public class Manager implements IManager {
             join = FieldLookup.translateJoin(entityName + "." + filters[i]);
             if (!joins.contains(join)) {
                joins += join;
-               filters[i] =
-                  filters[i].replace(filters[i].replaceAll("\\w+\\.\\w+__.*", ""), "");
+               filters[i] = filters[i].replace(filters[i].replaceAll("\\w+\\.\\w+__.*", ""), "");
             }
             if (filters[i].equalsIgnoreCase("AND")) {
                filters[i] = "AND";
@@ -5738,8 +5499,7 @@ public class Manager implements IManager {
             String[] decomposedEl = FieldLookup.decompose(filters[i]);
             if (decomposedEl.length > 0) {
                Field associationField = JediEngine.getField(decomposedEl[0], entity);
-               if (JediEngine.isOneToOneField(associationField) ||
-                  JediEngine.isForeignKeyField(associationField)) {
+               if (JediEngine.isOneToOneField(associationField) || JediEngine.isForeignKeyField(associationField)) {
                   filters[i] = filters[i].replace(decomposedEl[0], decomposedEl[0] + "_id");
                }
             }
@@ -5759,18 +5519,11 @@ public class Manager implements IManager {
             filters[i] = filters[i].replace(",", ", ");
             // Checks if the current pair contains __startswith, __contains
             // or __endswith.
-            if (filters[i].indexOf("__startswith") > -1 ||
-               filters[i].indexOf("__!startswith") > -1 ||
-               filters[i].indexOf("__istartswith") > -1 ||
-               filters[i].indexOf("__!istartswith") > -1 ||
-               filters[i].indexOf("__contains") > -1 ||
-               filters[i].indexOf("__!contains") > -1 ||
-               filters[i].indexOf("__icontains") > -1 ||
-               filters[i].indexOf("__!icontains") > -1 ||
-               filters[i].indexOf("__endswith") > -1 ||
-               filters[i].indexOf("__!endswith") > -1 ||
-               filters[i].indexOf("__iendswith") > -1 ||
-               filters[i].indexOf("__!iendswith") > -1) {
+            if (filters[i].indexOf("__startswith") > -1 || filters[i].indexOf("__!startswith") > -1 ||
+               filters[i].indexOf("__istartswith") > -1 || filters[i].indexOf("__!istartswith") > -1 ||
+               filters[i].indexOf("__contains") > -1 || filters[i].indexOf("__!contains") > -1 || filters[i].indexOf("__icontains") > -1 ||
+               filters[i].indexOf("__!icontains") > -1 || filters[i].indexOf("__endswith") > -1 || filters[i].indexOf("__!endswith") > -1 ||
+               filters[i].indexOf("__iendswith") > -1 || filters[i].indexOf("__!iendswith") > -1) {
                // Creates the LIKE SQL statement.
                if (filters[i].indexOf("__startswith") > -1) {
                   filters[i] = filters[i].replace("__startswith = ", " LIKE ");
@@ -5783,13 +5536,11 @@ public class Manager implements IManager {
                   filters[i] = filters[i].substring(0, filters[i].lastIndexOf("\'"));
                   filters[i] = filters[i] + "%\'";
                } else if (filters[i].indexOf("__istartswith") > -1) {
-                  filters[i] = filters[i]
-                     .replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                  filters[i] = filters[i].replaceAll("^(.*)__istartswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                   filters[i] = filters[i].substring(0, filters[i].lastIndexOf("\'"));
                   filters[i] = filters[i] + "%\')";
                } else if (filters[i].indexOf("__!istartswith") > -1) {
-                  filters[i] = filters[i]
-                     .replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                  filters[i] = filters[i].replaceAll("^(.*)__!istartswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                   filters[i] = filters[i].substring(0, filters[i].lastIndexOf("\'"));
                   filters[i] = filters[i] + "%\')";
                } else if (filters[i].indexOf("__contains") > -1) {
@@ -5805,14 +5556,12 @@ public class Manager implements IManager {
                   filters[i] = filters[i].substring(0, filters[i].lastIndexOf("\'"));
                   filters[i] = filters[i] + "%\'";
                } else if (filters[i].indexOf("__icontains") > -1) {
-                  filters[i] = filters[i]
-                     .replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                  filters[i] = filters[i].replaceAll("^(.*)__icontains *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                   filters[i] = filters[i].replaceFirst("\'", "\'%");
                   filters[i] = filters[i].substring(0, filters[i].lastIndexOf("\'"));
                   filters[i] = filters[i] + "%\')";
                } else if (filters[i].indexOf("__!icontains") > -1) {
-                  filters[i] = filters[i]
-                     .replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                  filters[i] = filters[i].replaceAll("^(.*)__!icontains *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                   filters[i] = filters[i].replaceFirst("\'", "\'%");
                   filters[i] = filters[i].substring(0, filters[i].lastIndexOf("\'"));
                   filters[i] = filters[i] + "%\')";
@@ -5825,13 +5574,11 @@ public class Manager implements IManager {
                   // Replaces 'value' by '%value'.
                   filters[i] = filters[i].replaceFirst("\'", "\'%");
                } else if (filters[i].indexOf("__iendswith") > -1) {
-                  filters[i] = filters[i]
-                     .replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
+                  filters[i] = filters[i].replaceAll("^(.*)__iendswith *= *(.*)$", "UPPER($1) LIKE UPPER($2)");
                   // Replaces 'value' by '%value'.
                   filters[i] = filters[i].replaceFirst("\'", "\'%");
                } else if (filters[i].indexOf("__!iendswith") > -1) {
-                  filters[i] = filters[i]
-                     .replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
+                  filters[i] = filters[i].replaceAll("^(.*)__!iendswith *= *(.*)$", "UPPER($1) NOT LIKE UPPER($2)");
                   // Replaces 'value' by '%value'.
                   filters[i] = filters[i].replaceFirst("\'", "\'%");
                } else {
@@ -5875,7 +5622,8 @@ public class Manager implements IManager {
             }
             if (filters[i].indexOf("__iregex") > -1) {
                filters[i] = filters[i].replaceAll("^(.*)__iregex ?= ?(.*)$", " $1 REGEXP '$2'");
-            }            if (filters[i].matches(".*__year__lt.*")) {
+            }
+            if (filters[i].matches(".*__year__lt.*")) {
                filters[i] = filters[i].replaceAll("^(.*)__year__lt *= *(\\d{4})$", " $1 < '$2-01-01'");
             }
             if (filters[i].matches(".*__year ?< ?.*")) {
@@ -6284,9 +6032,7 @@ public class Manager implements IManager {
                filters[i] = filters[i].replace("__!exact = ", " != ");
             }
             if (filters[i].indexOf("__isnull") > -1) {
-               String bool = filters[i]
-                  .substring(filters[i].indexOf("=") + 1, filters[i].length())
-                  .trim();
+               String bool = filters[i].substring(filters[i].indexOf("=") + 1, filters[i].length()).trim();
                if (bool.equalsIgnoreCase("true")) {
                   filters[i] = filters[i].replace("__isnull = ", " IS NULL ");
                }
@@ -6306,14 +6052,13 @@ public class Manager implements IManager {
          }
          where = where.trim();
          if (joins.isEmpty()) {
-            sql =
-               String.format("%s %s %s LIMIT %d OFFSET %d", sql, where, orderBy, _pageSize, _pageStart);
+            sql = String.format("%s %s %s LIMIT %d OFFSET %d", sql, where, orderBy, _pageSize, _pageStart);
          } else {
             sql = String.format("SELECT\n\t*\nFROM\n\t%s AS %s", tableName, entityName);
             sql += String.format("\n%s", joins);
             sql += String.format("WHERE\n\t%s", where);
-            orderBy = reverseOrder == false ? String.format("\nORDER BY\n\t%s.id ASC", entityName)
-               : String.format("\nORDER BY\n\t%s.id DESC", entityName);
+            orderBy = reverseOrder == false
+               ? String.format("\nORDER BY\n\t%s.id ASC", entityName) : String.format("\nORDER BY\n\t%s.id DESC", entityName);
             sql += orderBy;
             sql += String.format("\nLIMIT %d", _pageSize);
             sql += String.format("\nOFFSET %d", _pageStart);
@@ -6339,9 +6084,7 @@ public class Manager implements IManager {
                Field id = jedi.db.models.Model.class.getDeclaredField("id");
                id.setAccessible(true);
                if (connection.toString().startsWith("oracle")) {
-                  id.set(
-                     obj,
-                     ((java.math.BigDecimal) resultSet.getObject(id.getName())).intValue());
+                  id.set(obj, ((java.math.BigDecimal) resultSet.getObject(id.getName())).intValue());
                } else {
                   id.set(obj, resultSet.getObject(id.getName()));
                }
@@ -6360,8 +6103,7 @@ public class Manager implements IManager {
                FetchType fetchType = JediEngine.FETCH_TYPE;
                Manager manager = null;
                if (manyToManyFieldAnnotation != null) {
-                  fetchType = fetchType.equals(FetchType.NONE)
-                     ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                  fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
                   if (fetchType.equals(FetchType.EAGER)) {
                      Class superClazz = null;
                      Class clazz = null;
@@ -6370,11 +6112,9 @@ public class Manager implements IManager {
                      model = Model.class.getSimpleName().equals(model) ? "" : model;
                      if (model.isEmpty()) {
                         ParameterizedType genericType = null;
-                        if (ParameterizedType.class
-                           .isAssignableFrom(field.getGenericType().getClass())) {
+                        if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
                            genericType = (ParameterizedType) field.getGenericType();
-                           superClazz =
-                              ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
+                           superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
                            if (superClazz == Model.class) {
                               clazz = (Class) genericType.getActualTypeArguments()[0];
                               model = clazz.getSimpleName();
@@ -6389,8 +6129,7 @@ public class Manager implements IManager {
                            references = TableUtil.getTableName(model);
                         }
                      }
-                     Class associatedModelClass =
-                        Class.forName(String.format("%s.%s", packageName, model));
+                     Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, model));
                      manager = new Manager(associatedModelClass);
                      List<List<Map<String, Object>>> recordSet = null;
                      recordSet = manager.raw(
@@ -6408,8 +6147,7 @@ public class Manager implements IManager {
                      args = args.replace("}", "");
                      args = args.replace("=", "");
                      args = args.replace(", ", ",");
-                     args =
-                        args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
+                     args = args.replace(String.format("%s_id", TableUtil.getColumnName(model)), "");
                      args = String.format("id__in=[%s]", args);
                      QuerySet querySetAssociatedModels = manager._filter(args);
                      field.set(obj, querySetAssociatedModels);
@@ -6418,11 +6156,9 @@ public class Manager implements IManager {
                   }
                } else if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
                   if (oneToOneFieldAnnotation != null) {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
                   } else {
-                     fetchType = fetchType.equals(FetchType.NONE)
-                        ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                     fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
                   }
                   if (fetchType.equals(FetchType.EAGER)) {
                      Class associatedModelClass = Class.forName(field.getType().getName());
@@ -6435,8 +6171,7 @@ public class Manager implements IManager {
                      field.set(obj, null);
                   }
                } else {
-                  if ((field.getType().getSimpleName().equals("int") ||
-                     field.getType().getSimpleName().equals("Integer")) &&
+                  if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
                      connection.toString().startsWith("oracle")) {
                      if (resultSet.getObject(TableUtil.getColumnName(field.getName())) == null) {
                         field.set(obj, 0);
@@ -6450,7 +6185,10 @@ public class Manager implements IManager {
                      Object columnValue = resultSet.getObject(columnName);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        columnValue = new DateTime(timestamp.getTime());
+                        // TODO - Refatoração mudança de jedi.types.DateTime
+                        // para java.util.Date
+                        // columnValue = new DateTime(timestamp.getTime());
+                        columnValue = new Date(timestamp.getTime());
                      }
                      field.set(obj, columnValue);
                   }
@@ -6525,18 +6263,20 @@ public class Manager implements IManager {
    }
    
    @Override
-   public <T extends Model> QuerySet<T> page(QueryPageNumber pageNumber, QueryPageSize pageSize, QueryPageOrder pageOrder, String... filters) {
+   public <T extends Model> QuerySet<T> page(QueryPageNumber pageNumber, QueryPageSize pageSize, QueryPageOrder pageOrder,
+      String... filters) {
       QuerySet<T> qs = null;
       pageNumber = pageNumber == null ? new QueryPageNumber() : pageNumber;
       pageSize = pageSize == null ? new QueryPageSize() : pageSize;
       pageOrder = pageOrder == null ? QueryPage.orderBy("id") : pageOrder;
       QueryPageStart pageStart = new QueryPageStart();
-      // Calcula o deslocamento a partir da fórmula: deslocamento = (nº página - 1) x tamanho da página.
+      // Calcula o deslocamento a partir da fórmula: deslocamento = (nº página -
+      // 1) x tamanho da página.
       if (pageNumber.value() > 0) {
-         pageStart.value( (pageNumber.value() - 1) * pageSize.value());
+         pageStart.value((pageNumber.value() - 1) * pageSize.value());
          qs = page(pageStart, pageSize, pageOrder, filters);
       } else {
-         qs = page(pageStart(0), pageSize(0), pageOrder, filters); 
+         qs = page(pageStart(0), pageSize(0), pageOrder, filters);
       }
       return qs;
    }
@@ -6572,14 +6312,15 @@ public class Manager implements IManager {
    }
    
    @Override
-   public <T extends Model> QuerySet<T> reversePage(QueryPageStart pageStart, QueryPageSize pageSize, QueryPageOrder pageOrder, String... filters) {
+   public <T extends Model> QuerySet<T> reversePage(QueryPageStart pageStart, QueryPageSize pageSize, QueryPageOrder pageOrder,
+      String... filters) {
       String field = pageOrder != null ? pageOrder.field() : "";
       if (!field.isEmpty() && !field.startsWith("-")) {
          pageOrder.field("-" + field);
       }
       return page(pageStart, pageSize, pageOrder, filters);
    }
-
+   
    @Override
    public <T extends Model> QuerySet<T> reversePage(QueryPageStart pageStart, QueryPageSize pageSize, String... filters) {
       return reversePage(pageStart, pageSize, QueryPage.orderBy("-id"), filters);
@@ -6631,7 +6372,8 @@ public class Manager implements IManager {
    }
    
    @Override
-   public <T extends Model> QuerySet<T> reversePage(QueryPageNumber pageNumber, QueryPageSize pageSize, QueryPageOrder pageOrder, String... filters) {
+   public <T extends Model> QuerySet<T> reversePage(QueryPageNumber pageNumber, QueryPageSize pageSize, QueryPageOrder pageOrder,
+      String... filters) {
       String field = pageOrder != null ? pageOrder.field() : "";
       if (!field.isEmpty() && !field.startsWith("-")) {
          pageOrder.field("-" + field);
@@ -6668,18 +6410,18 @@ public class Manager implements IManager {
       Pattern pattern = Pattern.compile(Regex.LIKE_DATE.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
       Matcher matcher = pattern.matcher(sql);
       String regexp = "";
-//      System.out.println("SQL (IN): " + sql);
+      // System.out.println("SQL (IN): " + sql);
       while (matcher.find()) {
-//         System.out.println("Matcher Group: " + matcher.group());
+         // System.out.println("Matcher Group: " + matcher.group());
          regexp = matcher.group().replaceAll("(.*)LIKE(.*)", "DATE_FORMAT($1, '%d/%m/%Y') REGEXP$2");
          regexp = regexp.replaceAll(" , ", ", ");
          regexp = regexp.replaceAll("'%", "'.*");
          regexp = regexp.replaceAll("%'", ".*'");
          regexp = regexp.replace("'.*d", "'%d");
-//         System.out.println("MySQL RegExp: " + regexp);
+         // System.out.println("MySQL RegExp: " + regexp);
          sql = sql.replace(matcher.group(), regexp);
       }
-//      System.out.println("SQL (OUT): " + sql);
+      // System.out.println("SQL (OUT): " + sql);
       return sql;
    }
    
@@ -6687,18 +6429,18 @@ public class Manager implements IManager {
       Pattern pattern = Pattern.compile(Regex.LIKE_TIME.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
       Matcher matcher = pattern.matcher(sql);
       String regexp = "";
-//      System.out.println("SQL (IN): " + sql);
+      // System.out.println("SQL (IN): " + sql);
       while (matcher.find()) {
-//         System.out.println("Matcher Group: " + matcher.group());
+         // System.out.println("Matcher Group: " + matcher.group());
          regexp = matcher.group().replaceAll("(.*)LIKE(.*)", "DATE_FORMAT($1, '%T') REGEXP$2");
          regexp = regexp.replaceAll(" , ", ", ");
          regexp = regexp.replaceAll("'%", "'.*");
          regexp = regexp.replaceAll("%'", ".*'");
          regexp = regexp.replace("'.*T", "'%T");
-//         System.out.println("MySQL RegExp: " + regexp);
+         // System.out.println("MySQL RegExp: " + regexp);
          sql = sql.replace(matcher.group(), regexp);
       }
-//      System.out.println("SQL (OUT): " + sql);
+      // System.out.println("SQL (OUT): " + sql);
       return sql;
    }
    
@@ -6710,7 +6452,7 @@ public class Manager implements IManager {
          Pattern pattern = Pattern.compile(Regex.LIKE_DATETIME.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
          Matcher matcher = pattern.matcher(sql);
          String regexp = "";
-   //      System.out.println("SQL (IN): " + sql);
+         // System.out.println("SQL (IN): " + sql);
          while (matcher.find()) {
             regexp = matcher.group();
             regexp = regexp.replaceAll("(\\w+)_(\\w+)", "$1@$2");
@@ -6727,10 +6469,10 @@ public class Manager implements IManager {
                regexp = regexp.replace("$", "");
                regexp = regexp.replace("^", "");
             }
-   //         System.out.println("MySQL RegExp: " + regexp);
+            // System.out.println("MySQL RegExp: " + regexp);
             sql = sql.replace(matcher.group(), regexp);
          }
-   //      System.out.println("SQL (OUT): " + sql);
+         // System.out.println("SQL (OUT): " + sql);
       }
       return sql;
    }
