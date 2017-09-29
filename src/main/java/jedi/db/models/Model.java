@@ -746,11 +746,7 @@ public class Model implements IModel {
    public boolean equals(Object obj) {
       if (this == obj) return true;
       if (obj == null) return false;
-      if (!(obj instanceof Model)) return false;
-      if (getClass() != obj.getClass()) return false;
-      Model other = (Model) obj;
-      if (id != other.id) return false;
-      return true;
+      return (obj instanceof Model) && (this.id == ((Model) obj).id);
    }
    
    public int compareTo(Model model) {
