@@ -736,8 +736,8 @@ public class Model implements IModel {
    
    @Override
    public boolean equals(Object obj) {
-      if (this == obj) return true;
       if (obj == null) return false;
+      if (this == obj) return true;
       if (this.getClass() != obj.getClass()) return false;
       Model other = (Model) obj;
       if (this.id != other.id) return false;
