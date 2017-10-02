@@ -1807,6 +1807,24 @@ public class Manager implements IManager {
                         columnName = TableUtil.getColumnName(f.getName());
                         // Column´s value.
                         o = resultSet.getObject(columnName);
+                        if (o instanceof java.sql.Date) {
+                           java.sql.Date date = (java.sql.Date) o;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(date.getTime());
+                           calendar.set(Calendar.HOUR_OF_DAY, 0);
+                           calendar.set(Calendar.MINUTE, 0);
+                           calendar.set(Calendar.SECOND, 0);
+                           o = calendar.getTime();
+                        }
+                        if (o instanceof java.sql.Time) {
+                           java.sql.Time time = (java.sql.Time) o;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(time.getTime());
+                           calendar.set(Calendar.YEAR, 0);
+                           calendar.set(Calendar.MONTH, 0);
+                           calendar.set(Calendar.DAY_OF_MONTH, 0);
+                           o = calendar.getTime();
+                        }
                         if (o instanceof Timestamp) {
                            // TODO - Refatoração mudança de jedi.types.DateTime
                            // para java.util.Date

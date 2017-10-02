@@ -220,7 +220,6 @@ public class Model implements IModel {
                if (date != null) {
                   Calendar calendar = Calendar.getInstance();
                   calendar.setTime(date);
-//                  calendar.set(Calendar.MILLISECOND, 0);
                   if (annotationClass == DateField.class) {
                      values += String.format("'%d-%02d-%02d', ", date.getYear() + 1900, date.getMonth() + 1, date.getDate());
                   } else if (annotationClass == TimeField.class) {
@@ -553,7 +552,6 @@ public class Model implements IModel {
                   if (date != null) {
                      Calendar calendar = Calendar.getInstance();
                      calendar.setTime(date);
-                     calendar.set(Calendar.MILLISECOND, 0);
                      if (dateFieldAnnotation != null) {
                         fieldsAndValues += String.format("'%d-%02d-%02d', ", date.getYear() + 1900, date.getMonth() + 1, date.getDate());
                      } else if (timeFieldAnnotation != null) {
