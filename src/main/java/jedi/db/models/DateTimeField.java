@@ -29,4 +29,5 @@ public @interface DateTimeField {
     public String unique_for_month() default "";
     public String unique_for_year() default "";
     public String verbose_name() default "";
+    public int precision() default 3;
 }

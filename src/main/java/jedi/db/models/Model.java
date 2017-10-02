@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -217,19 +218,23 @@ public class Model implements IModel {
                field.getType().toString().endsWith("DateTime")) {
                Date date = (Date) field.get(this);
                if (date != null) {
+                  Calendar calendar = Calendar.getInstance();
+                  calendar.setTime(date);
+//                  calendar.set(Calendar.MILLISECOND, 0);
                   if (annotationClass == DateField.class) {
                      values += String.format("'%d-%02d-%02d', ", date.getYear() + 1900, date.getMonth() + 1, date.getDate());
                   } else if (annotationClass == TimeField.class) {
                      values += String.format("'%02d:%02d:%02d', ", date.getHours(), date.getMinutes(), date.getSeconds());
                   } else if (annotationClass == DateTimeField.class) {
                      values += String.format(
-                        "'%d-%02d-%02d %02d:%02d:%02d', ",
+                        "'%d-%02d-%02d %02d:%02d:%02d.%d', ",
                         date.getYear() + 1900,
                         date.getMonth() + 1,
                         date.getDate(),
                         date.getHours(),
                         date.getMinutes(),
-                        date.getSeconds());
+                        date.getSeconds(),
+                        calendar.get(Calendar.MILLISECOND));
                   } else {
                   
                   }
@@ -261,7 +266,8 @@ public class Model implements IModel {
                   } else if (annotationClass == DateTimeField.class) {
                      if (defaultValue.isEmpty()) {
                         if (((DateTimeField) annotation).auto_now_add()) {
-                           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                            values += String.format("'%s', ", sdf.format(new Date()));
                         } else {
                            columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
@@ -545,19 +551,23 @@ public class Model implements IModel {
                   field.getType().toString().endsWith("DateTime")) {
                   Date date = (Date) field.get(this);
                   if (date != null) {
+                     Calendar calendar = Calendar.getInstance();
+                     calendar.setTime(date);
+                     calendar.set(Calendar.MILLISECOND, 0);
                      if (dateFieldAnnotation != null) {
                         fieldsAndValues += String.format("'%d-%02d-%02d', ", date.getYear() + 1900, date.getMonth() + 1, date.getDate());
                      } else if (timeFieldAnnotation != null) {
                         fieldsAndValues += String.format("'%02d:%02d:%02d', ", date.getHours(), date.getMinutes(), date.getSeconds());
                      } else if (dateTimeFieldAnnotation != null) {
                         fieldsAndValues += String.format(
-                           "'%d-%02d-%02d %02d:%02d:%02d', ",
+                           "'%d-%02d-%02d %02d:%02d:%02d.%d', ",
                            date.getYear() + 1900,
                            date.getMonth() + 1,
                            date.getDate(),
                            date.getHours(),
                            date.getMinutes(),
-                           date.getSeconds());
+                           date.getSeconds(),
+                           calendar.get(Calendar.MILLISECOND));
                      } else {
                      
                      }
@@ -566,7 +576,7 @@ public class Model implements IModel {
                         defaultValue = JediEngine.getDefaultValue(dateFieldAnnotation);
                         if (defaultValue.isEmpty()) {
                            if (dateFieldAnnotation.auto_now()) {
-                              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                               fieldsAndValues += String.format("'%s', ", sdf.format(new Date()));
                            } else {
                               fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
@@ -592,7 +602,8 @@ public class Model implements IModel {
                         defaultValue = JediEngine.getDefaultValue(dateTimeFieldAnnotation);
                         if (defaultValue.isEmpty()) {
                            if (dateTimeFieldAnnotation.auto_now()) {
-                              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                               fieldsAndValues += String.format("'%s', ", sdf.format(new Date()));
                            } else {
                               fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");

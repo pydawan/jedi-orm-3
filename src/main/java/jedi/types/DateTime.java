@@ -1,5 +1,7 @@
 package jedi.types;
 
+import java.util.Calendar;
+
 import jedi.db.models.Regex;
 
 /**
@@ -13,9 +15,11 @@ public class DateTime extends java.util.Date {
    private static final long serialVersionUID = -1598588999773456561L;
    private static final String SQL_DATETIME_FORMAT = Regex.SQL_DATETIME_FORMAT.getValue();
    private static final String SQL_DATE_FORMAT = Regex.SQL_DATE_FORMAT.getValue();
+   private static final Calendar calendar = Calendar.getInstance();
    
    public DateTime() {
       super();
+      calendar.setTime(this);
    }
    
    public DateTime(java.util.Date date) {
@@ -25,25 +29,31 @@ public class DateTime extends java.util.Date {
       super.setHours(date.getHours());
       super.setMinutes(date.getMinutes());
       super.setSeconds(date.getSeconds());
+      calendar.setTime(this);
    }
    
    public DateTime(long time) {
       super(time);
+      calendar.setTime(this);
    }
    
    public DateTime(int year, int month, int date) {
       super(year - 1900, month - 1, date);
+      calendar.setTime(this);
    }
    
    public DateTime(int year, int month, int date, int hours, int minutes) {
       super(year - 1900, month - 1, date, hours, minutes);
+      calendar.setTime(this);
    }
    
    public DateTime(int year, int month, int date, int hours, int minutes, int seconds) {
       super(year - 1900, month - 1, date, hours, minutes, seconds);
+      calendar.setTime(this);
    }
    
    public DateTime(String value) {
+      calendar.setTime(this);
       value = value == null ? "" : value.trim();
       if (!value.isEmpty()) {
          String text = value;
@@ -97,9 +107,9 @@ public class DateTime extends java.util.Date {
             this.setYear(year);
             this.setMonth(month);
             this.setDate(date);
-            this.setHours(hours);
-            this.setMinutes(minutes);
-            this.setSeconds(seconds);
+            this.setHours(0);
+            this.setMinutes(0);
+            this.setSeconds(0);
          } else {
             
          }
@@ -245,6 +255,14 @@ public class DateTime extends java.util.Date {
       return this.getSeconds();
    }
    
+   public int getMilliSeconds() {
+      return calendar.get(Calendar.MILLISECOND);
+   }
+   
+   public int milliseconds() {
+      return getMilliSeconds();
+   }
+   
    @Override
    public void setYear(int year) {
       super.setYear(year - 1900);
@@ -297,6 +315,10 @@ public class DateTime extends java.util.Date {
    
    public void seconds(int seconds) {
       this.setSeconds(seconds);
+   }
+   
+   public void setMilliSeconds(int milliseconds) {
+      calendar.set(Calendar.MILLISECOND, milliseconds);
    }
    
 }

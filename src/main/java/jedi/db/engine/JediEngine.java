@@ -1203,8 +1203,8 @@ public abstract class JediEngine {
             } else if (ac == TimeField.class) {
                formatter = "%s TIME%s%s%s%s";
             } else if (ac == DateTimeField.class) {
-               // formatter = "%s DATETIME%s%s%s%s%s";
-               formatter = "%s DATETIME%s%s%s%s";
+//               formatter = "%s DATETIME%s%s%s%s";
+               formatter = "%s DATETIME(3)%s%s%s%s";
             } else {
                
             }
@@ -2529,10 +2529,12 @@ public abstract class JediEngine {
             }
             if (MYSQL_VERSION >= 56) {
                if (annotation.auto_now_add()) {
-                  _default = " DEFAULT CURRENT_TIMESTAMP";
+//                  _default = " DEFAULT CURRENT_TIMESTAMP";
+                  _default = " DEFAULT CURRENT_TIMESTAMP(3)";
                }
                if (annotation.auto_now()) {
-                  _default = String.format("%s ON UPDATE CURRENT_TIMESTAMP", _default);
+//                  _default = String.format("%s ON UPDATE CURRENT_TIMESTAMP", _default);
+                  _default = String.format("%s ON UPDATE CURRENT_TIMESTAMP(3)", _default);
                }
             } else {
                if (annotation.auto_now_add()) {

@@ -25,6 +25,7 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -298,7 +299,10 @@ public class Manager implements IManager {
                         // TODO - Refatoração mudança de jedi.types.DateTime
                         // para java.util.Date
                         // columnValue = new DateTime(timestamp.getTime());
-                        columnValue = new Date(timestamp.getTime());
+//                        columnValue = new Date(timestamp.getTime());
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(timestamp.getTime());
+                        columnValue = calendar.getTime();
                      }
                      field.set(obj, columnValue);
                   }
@@ -650,7 +654,9 @@ public class Manager implements IManager {
                            // TODO - Refatoração mudança de jedi.types.DateTime
                            // para java.util.Date
                            // columnValue = new DateTime(timestamp.getTime());
-                           columnValue = new Date(timestamp.getTime());
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(timestamp.getTime());
+                           columnValue = calendar.getTime();
                         }
                         field.set(obj, columnValue);
                      }
@@ -749,6 +755,7 @@ public class Manager implements IManager {
                } else if (value.matches("\\d+.d+")) { // Double
                   f.set(obj, Double.parseDouble(value));
                } else if (f.getType().getName().equals("java.util.Date") || f.getType().getName().equals("jedi.types.DateTime")) {
+                  // TODO - corrigir tratamento da data.
                   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                   Date date = formatter.parse(list[i].split("=")[1].replace("'", ""));
                   f.set(obj, date);
@@ -1352,7 +1359,9 @@ public class Manager implements IManager {
                            // TODO - Refatoração mudança de jedi.types.DateTime
                            // para java.util.Date
                            // columnValue = new DateTime(timestamp.getTime());
-                           columnValue = new Date(timestamp.getTime());
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(timestamp.getTime());
+                           columnValue = calendar.getTime();
                         }
                         field.set(obj, columnValue);
                      }
@@ -1588,7 +1597,9 @@ public class Manager implements IManager {
                            // TODO - Refatoração mudança de jedi.types.DateTime
                            // para java.util.Date
                            // columnValue = new DateTime(timestamp.getTime());
-                           columnValue = new Date(timestamp.getTime());
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(timestamp.getTime());
+                           columnValue = calendar.getTime();
                         }
                         field.set(o, columnValue);
                      }
@@ -1800,7 +1811,11 @@ public class Manager implements IManager {
                            // TODO - Refatoração mudança de jedi.types.DateTime
                            // para java.util.Date
                            // o = new DateTime(((Timestamp) o).getTime());
-                           o = new Date(((Timestamp) o).getTime());
+//                           o = new Date(((Timestamp) o).getTime());
+                           Timestamp timestamp = (Timestamp) o;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(timestamp.getTime());
+                           o = calendar.getTime();
                         }
                         f.set(model, o);
                      }
@@ -2495,10 +2510,12 @@ public class Manager implements IManager {
                      columnValue = convertZeroDateToNull(columnValue);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        // TODO - Refatoração mudança de jedi.types.DateTime
-                        // para java.util.Date
-                        // columnValue = new DateTime(timestamp.getTime());
-                        columnValue = new Date(timestamp.getTime());
+//                         TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
+//                         columnValue = new DateTime(timestamp.getTime());
+//                        columnValue = new Date(timestamp.getTime());
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(timestamp.getTime());
+                        columnValue = calendar.getTime();
                      }
                      field.set(o, columnValue);
                   }
@@ -2699,10 +2716,12 @@ public class Manager implements IManager {
                      columnValue = convertZeroDateToNull(columnValue);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        // TODO - Refatoração mudança de jedi.types.DateTime
-                        // para java.util.Date
-                        // columnValue = new DateTime(timestamp.getTime());
-                        columnValue = new Date(timestamp.getTime());
+//                         TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
+//                        columnValue = new DateTime(timestamp.getTime());
+//                        columnValue = new Date(timestamp.getTime());
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(timestamp.getTime());
+                        columnValue = calendar.getTime();
                      }
                      field.set(o, columnValue);
                   }
@@ -3284,10 +3303,12 @@ public class Manager implements IManager {
                      Object columnValue = resultSet.getObject(columnName);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        // TODO - Refatoração mudança de jedi.types.DateTime
-                        // para java.util.Date
-                        // columnValue = new DateTime(timestamp.getTime());
-                        columnValue = new Date(timestamp.getTime());
+//                         TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
+//                        columnValue = new DateTime(timestamp.getTime());
+//                        columnValue = new Date(timestamp.getTime());
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(timestamp.getTime());
+                        columnValue = calendar.getTime();
                      }
                      field.set(obj, columnValue);
                   }
@@ -4078,10 +4099,12 @@ public class Manager implements IManager {
                         Object columnValue = resultSet.getObject(columnName);
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           // TODO - Refatoração mudança de jedi.types.DateTime
-                           // para java.util.Date
-                           // columnValue = new DateTime(timestamp.getTime());
-                           columnValue = new Date(timestamp.getTime());
+//                            TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
+//                           columnValue = new DateTime(timestamp.getTime());
+//                           columnValue = new Date(timestamp.getTime());
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(timestamp.getTime());
+                           columnValue = calendar.getTime();
                         }
                         field.set(obj, columnValue);
                      }
@@ -5434,10 +5457,12 @@ public class Manager implements IManager {
                         Object columnValue = resultSet.getObject(columnName);
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           // TODO - Refatoração mudança de jedi.types.DateTime
-                           // para java.util.Date
-                           // columnValue = new DateTime(timestamp.getTime());
-                           columnValue = new Date(timestamp.getTime());
+//                            TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
+//                           columnValue = new DateTime(timestamp.getTime());
+//                           columnValue = new Date(timestamp.getTime());
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(timestamp.getTime());
+                           columnValue = calendar.getTime();
                         }
                         field.set(obj, columnValue);
                      }
@@ -6185,10 +6210,12 @@ public class Manager implements IManager {
                      Object columnValue = resultSet.getObject(columnName);
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        // TODO - Refatoração mudança de jedi.types.DateTime
-                        // para java.util.Date
-                        // columnValue = new DateTime(timestamp.getTime());
-                        columnValue = new Date(timestamp.getTime());
+//                         TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
+//                        columnValue = new DateTime(timestamp.getTime());
+//                        columnValue = new Date(timestamp.getTime());
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(timestamp.getTime());
+                        columnValue = calendar.getTime();
                      }
                      field.set(obj, columnValue);
                   }
