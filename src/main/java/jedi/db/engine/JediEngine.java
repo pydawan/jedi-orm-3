@@ -1194,6 +1194,9 @@ public abstract class JediEngine {
       } else {
          
       }
+      if (precision < 0) {
+         precision = 0;
+      }
       if (precision > 6) {
          precision = 6;
       }
