@@ -63,6 +63,7 @@ import jedi.db.models.QuerySet;
 import jedi.db.models.Table;
 import jedi.db.models.TextField;
 import jedi.db.models.TimeField;
+import jedi.db.models.TimestampField;
 import jedi.db.models.URLField;
 import jedi.db.util.ColumnUtil;
 import jedi.db.util.TableUtil;
@@ -1181,6 +1182,24 @@ public abstract class JediEngine {
       return dv;
    }
    
+   public static int getPrecision(Annotation annotation) {
+      int precision = 0;
+      Class ac = annotation == null ? null : annotation.annotationType();
+      if (ac == TimeField.class) {
+         precision = ((TimeField) annotation).precision();
+      } else if (ac == DateTimeField.class) {
+         precision = ((DateTimeField) annotation).precision();
+      } else if (ac == TimestampField.class) {
+         precision = ((TimestampField) annotation).precision();
+      } else {
+         
+      }
+      if (precision > 6) {
+         precision = 6;
+      }
+      return precision;
+   }
+   
    private static String getSQLFormatter(Annotation annotation, String databaseEngine) {
       String formatter = null;
       Class ac = annotation == null ? null : annotation.annotationType();
@@ -1203,8 +1222,7 @@ public abstract class JediEngine {
             } else if (ac == TimeField.class) {
                formatter = "%s TIME%s%s%s%s";
             } else if (ac == DateTimeField.class) {
-//               formatter = "%s DATETIME%s%s%s%s";
-               formatter = "%s DATETIME(3)%s%s%s%s";
+               formatter = "%s DATETIME%s%s%s%s";
             } else {
                
             }
@@ -2523,18 +2541,25 @@ public abstract class JediEngine {
             String notNull = annotation.required() ? " NOT NULL" : "";
             String unique = annotation.unique() ? " UNIQUE" : "";
             String _default = defaultValue.isEmpty() ? "" : String.format(" DEFAULT '%s'", defaultValue);
+            int precision = getPrecision(annotation);
             // TODO - essa tratativa deve ficar no método getComment().
             if (DATABASE_ENGINE.equals("mysql")) {
                comment = comment.isEmpty() ? "" : String.format(" COMMENT '%s'", comment);
             }
             if (MYSQL_VERSION >= 56) {
                if (annotation.auto_now_add()) {
-//                  _default = " DEFAULT CURRENT_TIMESTAMP";
-                  _default = " DEFAULT CURRENT_TIMESTAMP(3)";
+                  if (precision <= 0) {
+                     _default = " DEFAULT CURRENT_TIMESTAMP";
+                  } else {
+                     _default = String.format(" DEFAULT CURRENT_TIMESTAMP(%s)", precision);
+                  }
                }
                if (annotation.auto_now()) {
-//                  _default = String.format("%s ON UPDATE CURRENT_TIMESTAMP", _default);
-                  _default = String.format("%s ON UPDATE CURRENT_TIMESTAMP(3)", _default);
+                  if (precision <= 0) {
+                     _default = String.format("%s ON UPDATE CURRENT_TIMESTAMP", _default);
+                  } else {
+                     _default = String.format("%s ON UPDATE CURRENT_TIMESTAMP(%s)", _default, precision);
+                  }
                }
             } else {
                if (annotation.auto_now_add()) {
@@ -2554,7 +2579,12 @@ public abstract class JediEngine {
                   }
                }
             }
-            sql = String.format(formatter, column, notNull, _default, unique, comment);
+            if (precision <= 0) {
+               sql = String.format(formatter, column, notNull, _default, unique, comment);
+            } else {
+               formatter = formatter.replace("DATETIME", "DATETIME(%s)");
+               sql = String.format(formatter, column, precision, notNull, _default, unique, comment);
+            }
          }
       }
       return sql;

@@ -29,5 +29,5 @@ public @interface DateField {
    public String unique_for_month() default "";
    public String unique_for_year() default "";
    public String verbose_name() default "";
-   public String[]choices() default "";
+   public String[] choices() default "";
 }

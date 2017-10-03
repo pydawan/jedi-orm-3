@@ -221,19 +221,44 @@ public class Model implements IModel {
                   Calendar calendar = Calendar.getInstance();
                   calendar.setTime(date);
                   if (annotationClass == DateField.class) {
+                     calendar.set(Calendar.HOUR_OF_DAY, 0);
+                     calendar.set(Calendar.MINUTE,  0);
+                     calendar.set(Calendar.SECOND, 0);
+                     calendar.set(Calendar.MILLISECOND, 0);
+                     date = calendar.getTime();
+                     field.set(this, date);
                      values += String.format("'%d-%02d-%02d', ", date.getYear() + 1900, date.getMonth() + 1, date.getDate());
                   } else if (annotationClass == TimeField.class) {
+                     calendar.set(Calendar.YEAR, 0);
+                     calendar.set(Calendar.MONTH, 0);
+                     calendar.set(Calendar.DAY_OF_MONTH, 0);
+                     date = calendar.getTime();
+                     field.set(this, date);
                      values += String.format("'%02d:%02d:%02d', ", date.getHours(), date.getMinutes(), date.getSeconds());
                   } else if (annotationClass == DateTimeField.class) {
-                     values += String.format(
-                        "'%d-%02d-%02d %02d:%02d:%02d.%d', ",
-                        date.getYear() + 1900,
-                        date.getMonth() + 1,
-                        date.getDate(),
-                        date.getHours(),
-                        date.getMinutes(),
-                        date.getSeconds(),
-                        calendar.get(Calendar.MILLISECOND));
+                     int precision = ((DateTimeField) annotation).precision();
+                     if (precision <= 0) {
+                        values += String.format(
+                           "'%d-%02d-%02d %02d:%02d:%02d', ",
+                           date.getYear() + 1900,
+                           date.getMonth() + 1,
+                           date.getDate(),
+                           date.getHours(),
+                           date.getMinutes(),
+                           date.getSeconds()
+                        );
+                     } else {
+                        values += String.format(
+                           "'%d-%02d-%02d %02d:%02d:%02d.%d', ",
+                           date.getYear() + 1900,
+                           date.getMonth() + 1,
+                           date.getDate(),
+                           date.getHours(),
+                           date.getMinutes(),
+                           date.getSeconds(),
+                           calendar.get(Calendar.MILLISECOND)
+                        );
+                     }
                   } else {
                   
                   }
@@ -265,8 +290,30 @@ public class Model implements IModel {
                   } else if (annotationClass == DateTimeField.class) {
                      if (defaultValue.isEmpty()) {
                         if (((DateTimeField) annotation).auto_now_add()) {
-//                           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                           int precision = ((DateTimeField) annotation).precision();
+                           SimpleDateFormat sdf = null;
+                           switch (precision) {
+                              case 1:
+                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+                                 break;
+                              case 2:
+                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
+                                 break;
+                              case 3:
+                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                                 break;
+                              case 4:
+                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS");
+                                 break;
+                              case 5:
+                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSS");
+                                 break;
+                              case 6:
+                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+                                 break;
+                              default:
+                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                           }
                            values += String.format("'%s', ", sdf.format(new Date()));
                         } else {
                            columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
@@ -553,19 +600,44 @@ public class Model implements IModel {
                      Calendar calendar = Calendar.getInstance();
                      calendar.setTime(date);
                      if (dateFieldAnnotation != null) {
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE,  0);
+                        calendar.set(Calendar.SECOND, 0);
+                        calendar.set(Calendar.MILLISECOND, 0);
+                        date = calendar.getTime();
+                        field.set(this, date);
                         fieldsAndValues += String.format("'%d-%02d-%02d', ", date.getYear() + 1900, date.getMonth() + 1, date.getDate());
                      } else if (timeFieldAnnotation != null) {
+                        calendar.set(Calendar.YEAR, 0);
+                        calendar.set(Calendar.MONTH, 0);
+                        calendar.set(Calendar.DAY_OF_MONTH, 0);
+                        date = calendar.getTime();
+                        field.set(this, date);
                         fieldsAndValues += String.format("'%02d:%02d:%02d', ", date.getHours(), date.getMinutes(), date.getSeconds());
                      } else if (dateTimeFieldAnnotation != null) {
-                        fieldsAndValues += String.format(
-                           "'%d-%02d-%02d %02d:%02d:%02d.%d', ",
-                           date.getYear() + 1900,
-                           date.getMonth() + 1,
-                           date.getDate(),
-                           date.getHours(),
-                           date.getMinutes(),
-                           date.getSeconds(),
-                           calendar.get(Calendar.MILLISECOND));
+                        int precision = dateTimeFieldAnnotation.precision();
+                        if (precision <= 0) {
+                           fieldsAndValues += String.format(
+                              "'%d-%02d-%02d %02d:%02d:%02d', ",
+                              date.getYear() + 1900,
+                              date.getMonth() + 1,
+                              date.getDate(),
+                              date.getHours(),
+                              date.getMinutes(),
+                              date.getSeconds()
+                           );
+                        } else {
+                           fieldsAndValues += String.format(
+                              "'%d-%02d-%02d %02d:%02d:%02d.%d', ",
+                              date.getYear() + 1900,
+                              date.getMonth() + 1,
+                              date.getDate(),
+                              date.getHours(),
+                              date.getMinutes(),
+                              date.getSeconds(),
+                              calendar.get(Calendar.MILLISECOND)
+                           );
+                        }
                      } else {
                      
                      }
@@ -600,8 +672,30 @@ public class Model implements IModel {
                         defaultValue = JediEngine.getDefaultValue(dateTimeFieldAnnotation);
                         if (defaultValue.isEmpty()) {
                            if (dateTimeFieldAnnotation.auto_now()) {
-//                              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                              int precision = dateTimeFieldAnnotation.precision();
+                              SimpleDateFormat sdf = null;
+                              switch (precision) {
+                                 case 1:
+                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+                                    break;
+                                 case 2:
+                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
+                                    break;
+                                 case 3:
+                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                                    break;
+                                 case 4:
+                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS");
+                                    break;
+                                 case 5:
+                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSS");
+                                    break;
+                                 case 6:
+                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+                                    break;
+                                 default:
+                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                              }
                               fieldsAndValues += String.format("'%s', ", sdf.format(new Date()));
                            } else {
                               fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");

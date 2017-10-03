@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DateTimeField {
+public @interface TimestampField {
     public boolean auto_now() default false;
     public boolean auto_now_add() default false;
     public boolean required() default true;

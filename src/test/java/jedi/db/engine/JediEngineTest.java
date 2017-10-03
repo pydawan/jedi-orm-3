@@ -1,5 +1,7 @@
 package jedi.db.engine;
 
+import java.util.Date;
+
 import org.junit.Test;
 
 import jedi.types.DateTime;
@@ -31,6 +33,9 @@ public class JediEngineTest {
       System.out.println(new DateTime());
       System.out.println(DateTime.datetime());
       System.out.println(DateTime.of());
+      
+      Date data = new Date();
+      data.getTime();
    }
    
 }
