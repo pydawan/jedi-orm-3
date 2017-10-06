@@ -427,7 +427,8 @@ public abstract class JediEngine {
     * @param file
     */
    public static void sqlall(File file) {
-      String path = file == null ? "" : file.getAbsolutePath();
+//      String path = file == null ? "" : file.getAbsolutePath();
+      String path = file == null ? "" : normalizeFilePath(file.getAbsolutePath());
       CREATE_TABLES = new HashMap<>();
       SQL_CREATE_TABLES = new ArrayList<>();
       getSQLOfInstalledApps();
@@ -590,7 +591,8 @@ public abstract class JediEngine {
                      }
                   }
                } else {
-                  modelFiles.addAll(getModelFiles(appDirContent.getAbsolutePath()));
+//                  modelFiles.addAll(getModelFiles(appDirContent.getAbsolutePath()));
+                  modelFiles.addAll(getModelFiles(normalizeFilePath(appDirContent.getAbsolutePath())));
                }
             }
          }
@@ -2962,6 +2964,7 @@ public abstract class JediEngine {
       boolean is = false;
       if (file != null && file.exists()) {
          String modelClassName = file.getAbsolutePath();
+//         String modelClassName = normalizeFilePath(file.getAbsolutePath());
          if (modelClassName.endsWith("class") || modelClassName.endsWith("java")) {
             modelClassName = JediEngine.convertFilePathToClassPath(modelClassName);
             Class modelClass = null;
