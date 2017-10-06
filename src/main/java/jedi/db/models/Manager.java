@@ -3419,6 +3419,8 @@ public class Manager implements IManager {
                if (!joins.contains(join)) {
                   joins += join;
                   fields[i] = fields[i].replace(fields[i].replaceAll("\\w+\\.\\w+__.*", ""), "");
+//                  TODO - verificar o tipo do atributo e decidir se usa likeDateTime ou não.
+//                  fields[i] = fields[i].replace(fields[i].replaceAll("(\\w+\\.\\w+)+__.*", ""), "");
                }
                if (fields[i].equalsIgnoreCase("AND")) {
                   fields[i] = "AND";
