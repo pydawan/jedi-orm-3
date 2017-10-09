@@ -294,12 +294,26 @@ public class Manager implements IManager {
                   } else {
                      Object columnValue = resultSet.getObject(TableUtil.getColumnName(field));
                      columnValue = convertZeroDateToNull(columnValue);
+                     if (columnValue instanceof java.sql.Date) {
+                        java.sql.Date date = (java.sql.Date) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(date.getTime());
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        columnValue = calendar.getTime();
+                     }
+                     if (columnValue instanceof java.sql.Time) {
+                        java.sql.Time time = (java.sql.Time) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(time.getTime());
+                        calendar.set(Calendar.YEAR, 0);
+                        calendar.set(Calendar.MONTH, 0);
+                        calendar.set(Calendar.DAY_OF_MONTH, 0);
+                        columnValue = calendar.getTime();
+                     }
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-                        // TODO - Refatoração mudança de jedi.types.DateTime
-                        // para java.util.Date
-                        // columnValue = new DateTime(timestamp.getTime());
-//                        columnValue = new Date(timestamp.getTime());
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTimeInMillis(timestamp.getTime());
                         columnValue = calendar.getTime();
@@ -649,11 +663,26 @@ public class Manager implements IManager {
                      } else {
                         String columnName = TableUtil.getColumnName(field.getName());
                         Object columnValue = resultSet.getObject(columnName);
+                        if (columnValue instanceof java.sql.Date) {
+                           java.sql.Date date = (java.sql.Date) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(date.getTime());
+                           calendar.set(Calendar.HOUR_OF_DAY, 0);
+                           calendar.set(Calendar.MINUTE, 0);
+                           calendar.set(Calendar.SECOND, 0);
+                           columnValue = calendar.getTime();
+                        }
+                        if (columnValue instanceof java.sql.Time) {
+                           java.sql.Time time = (java.sql.Time) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(time.getTime());
+                           calendar.set(Calendar.YEAR, 0);
+                           calendar.set(Calendar.MONTH, 0);
+                           calendar.set(Calendar.DAY_OF_MONTH, 0);
+                           columnValue = calendar.getTime();
+                        }
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           // TODO - Refatoração mudança de jedi.types.DateTime
-                           // para java.util.Date
-                           // columnValue = new DateTime(timestamp.getTime());
                            Calendar calendar = Calendar.getInstance();
                            calendar.setTimeInMillis(timestamp.getTime());
                            columnValue = calendar.getTime();
@@ -1354,11 +1383,26 @@ public class Manager implements IManager {
                      } else {
                         String columnName = TableUtil.getColumnName(field);
                         Object columnValue = resultSet.getObject(columnName);
+                        if (columnValue instanceof java.sql.Date) {
+                           java.sql.Date date = (java.sql.Date) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(date.getTime());
+                           calendar.set(Calendar.HOUR_OF_DAY, 0);
+                           calendar.set(Calendar.MINUTE, 0);
+                           calendar.set(Calendar.SECOND, 0);
+                           columnValue = calendar.getTime();
+                        }
+                        if (columnValue instanceof java.sql.Time) {
+                           java.sql.Time time = (java.sql.Time) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(time.getTime());
+                           calendar.set(Calendar.YEAR, 0);
+                           calendar.set(Calendar.MONTH, 0);
+                           calendar.set(Calendar.DAY_OF_MONTH, 0);
+                           columnValue = calendar.getTime();
+                        }
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           // TODO - Refatoração mudança de jedi.types.DateTime
-                           // para java.util.Date
-                           // columnValue = new DateTime(timestamp.getTime());
                            Calendar calendar = Calendar.getInstance();
                            calendar.setTimeInMillis(timestamp.getTime());
                            columnValue = calendar.getTime();
@@ -1592,11 +1636,26 @@ public class Manager implements IManager {
                      } else {
                         String columnName = TableUtil.getColumnName(field);
                         Object columnValue = rs.getObject(columnName);
+                        if (columnValue instanceof java.sql.Date) {
+                           java.sql.Date date = (java.sql.Date) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(date.getTime());
+                           calendar.set(Calendar.HOUR_OF_DAY, 0);
+                           calendar.set(Calendar.MINUTE, 0);
+                           calendar.set(Calendar.SECOND, 0);
+                           columnValue = calendar.getTime();
+                        }
+                        if (columnValue instanceof java.sql.Time) {
+                           java.sql.Time time = (java.sql.Time) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(time.getTime());
+                           calendar.set(Calendar.YEAR, 0);
+                           calendar.set(Calendar.MONTH, 0);
+                           calendar.set(Calendar.DAY_OF_MONTH, 0);
+                           columnValue = calendar.getTime();
+                        }
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-                           // TODO - Refatoração mudança de jedi.types.DateTime
-                           // para java.util.Date
-                           // columnValue = new DateTime(timestamp.getTime());
                            Calendar calendar = Calendar.getInstance();
                            calendar.setTimeInMillis(timestamp.getTime());
                            columnValue = calendar.getTime();
@@ -2526,11 +2585,26 @@ public class Manager implements IManager {
                   } else {
                      Object columnValue = rs.getObject(TableUtil.getColumnName(field));
                      columnValue = convertZeroDateToNull(columnValue);
+                     if (columnValue instanceof java.sql.Date) {
+                        java.sql.Date date = (java.sql.Date) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(date.getTime());
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        columnValue = calendar.getTime();
+                     }
+                     if (columnValue instanceof java.sql.Time) {
+                        java.sql.Time time = (java.sql.Time) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(time.getTime());
+                        calendar.set(Calendar.YEAR, 0);
+                        calendar.set(Calendar.MONTH, 0);
+                        calendar.set(Calendar.DAY_OF_MONTH, 0);
+                        columnValue = calendar.getTime();
+                     }
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-//                         TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
-//                         columnValue = new DateTime(timestamp.getTime());
-//                        columnValue = new Date(timestamp.getTime());
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTimeInMillis(timestamp.getTime());
                         columnValue = calendar.getTime();
@@ -2732,11 +2806,26 @@ public class Manager implements IManager {
                   } else {
                      Object columnValue = rs.getObject(TableUtil.getColumnName(field));
                      columnValue = convertZeroDateToNull(columnValue);
+                     if (columnValue instanceof java.sql.Date) {
+                        java.sql.Date date = (java.sql.Date) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(date.getTime());
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        columnValue = calendar.getTime();
+                     }
+                     if (columnValue instanceof java.sql.Time) {
+                        java.sql.Time time = (java.sql.Time) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(time.getTime());
+                        calendar.set(Calendar.YEAR, 0);
+                        calendar.set(Calendar.MONTH, 0);
+                        calendar.set(Calendar.DAY_OF_MONTH, 0);
+                        columnValue = calendar.getTime();
+                     }
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-//                         TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
-//                        columnValue = new DateTime(timestamp.getTime());
-//                        columnValue = new Date(timestamp.getTime());
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTimeInMillis(timestamp.getTime());
                         columnValue = calendar.getTime();
@@ -3319,11 +3408,26 @@ public class Manager implements IManager {
                   } else {
                      String columnName = TableUtil.getColumnName(field.getName());
                      Object columnValue = resultSet.getObject(columnName);
+                     if (columnValue instanceof java.sql.Date) {
+                        java.sql.Date date = (java.sql.Date) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(date.getTime());
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        columnValue = calendar.getTime();
+                     }
+                     if (columnValue instanceof java.sql.Time) {
+                        java.sql.Time time = (java.sql.Time) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(time.getTime());
+                        calendar.set(Calendar.YEAR, 0);
+                        calendar.set(Calendar.MONTH, 0);
+                        calendar.set(Calendar.DAY_OF_MONTH, 0);
+                        columnValue = calendar.getTime();
+                     }
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-//                         TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
-//                        columnValue = new DateTime(timestamp.getTime());
-//                        columnValue = new Date(timestamp.getTime());
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTimeInMillis(timestamp.getTime());
                         columnValue = calendar.getTime();
@@ -4117,11 +4221,26 @@ public class Manager implements IManager {
                      } else {
                         String columnName = TableUtil.getColumnName(field.getName());
                         Object columnValue = resultSet.getObject(columnName);
+                        if (columnValue instanceof java.sql.Date) {
+                           java.sql.Date date = (java.sql.Date) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(date.getTime());
+                           calendar.set(Calendar.HOUR_OF_DAY, 0);
+                           calendar.set(Calendar.MINUTE, 0);
+                           calendar.set(Calendar.SECOND, 0);
+                           columnValue = calendar.getTime();
+                        }
+                        if (columnValue instanceof java.sql.Time) {
+                           java.sql.Time time = (java.sql.Time) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(time.getTime());
+                           calendar.set(Calendar.YEAR, 0);
+                           calendar.set(Calendar.MONTH, 0);
+                           calendar.set(Calendar.DAY_OF_MONTH, 0);
+                           columnValue = calendar.getTime();
+                        }
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-//                            TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
-//                           columnValue = new DateTime(timestamp.getTime());
-//                           columnValue = new Date(timestamp.getTime());
                            Calendar calendar = Calendar.getInstance();
                            calendar.setTimeInMillis(timestamp.getTime());
                            columnValue = calendar.getTime();
@@ -5475,11 +5594,26 @@ public class Manager implements IManager {
                      } else {
                         String columnName = TableUtil.getColumnName(field);
                         Object columnValue = resultSet.getObject(columnName);
+                        if (columnValue instanceof java.sql.Date) {
+                           java.sql.Date date = (java.sql.Date) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(date.getTime());
+                           calendar.set(Calendar.HOUR_OF_DAY, 0);
+                           calendar.set(Calendar.MINUTE, 0);
+                           calendar.set(Calendar.SECOND, 0);
+                           columnValue = calendar.getTime();
+                        }
+                        if (columnValue instanceof java.sql.Time) {
+                           java.sql.Time time = (java.sql.Time) columnValue;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(time.getTime());
+                           calendar.set(Calendar.YEAR, 0);
+                           calendar.set(Calendar.MONTH, 0);
+                           calendar.set(Calendar.DAY_OF_MONTH, 0);
+                           columnValue = calendar.getTime();
+                        }
                         if (columnValue instanceof Timestamp) {
                            Timestamp timestamp = (Timestamp) columnValue;
-//                            TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
-//                           columnValue = new DateTime(timestamp.getTime());
-//                           columnValue = new Date(timestamp.getTime());
                            Calendar calendar = Calendar.getInstance();
                            calendar.setTimeInMillis(timestamp.getTime());
                            columnValue = calendar.getTime();
@@ -6228,11 +6362,26 @@ public class Manager implements IManager {
                   } else {
                      String columnName = TableUtil.getColumnName(field.getName());
                      Object columnValue = resultSet.getObject(columnName);
+                     if (columnValue instanceof java.sql.Date) {
+                        java.sql.Date date = (java.sql.Date) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(date.getTime());
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        columnValue = calendar.getTime();
+                     }
+                     if (columnValue instanceof java.sql.Time) {
+                        java.sql.Time time = (java.sql.Time) columnValue;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(time.getTime());
+                        calendar.set(Calendar.YEAR, 0);
+                        calendar.set(Calendar.MONTH, 0);
+                        calendar.set(Calendar.DAY_OF_MONTH, 0);
+                        columnValue = calendar.getTime();
+                     }
                      if (columnValue instanceof Timestamp) {
                         Timestamp timestamp = (Timestamp) columnValue;
-//                         TODO - Refatoração mudança de jedi.types.DateTime para java.util.Date
-//                        columnValue = new DateTime(timestamp.getTime());
-//                        columnValue = new Date(timestamp.getTime());
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTimeInMillis(timestamp.getTime());
                         columnValue = calendar.getTime();
