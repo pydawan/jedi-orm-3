@@ -6503,7 +6503,8 @@ public class Manager implements IManager {
          while (matcher.find()) {
             regexp = matcher.group();
             regexp = regexp.replaceAll("(\\w+)_(\\w+)", "$1@$2");
-            regexp = regexp.replaceAll("[/_]", "");
+//            regexp = regexp.replaceAll("[/_]", "");
+            regexp = regexp.replaceAll("[//_]", "");
             regexp = regexp.replaceAll("@", "_");
             regexp = regexp.replaceAll("(.*)LIKE(.*)", "DATE_FORMAT($1, '%d%m%Y %T') REGEXP$2");
             regexp = regexp.replaceAll(" , ", ", ");
