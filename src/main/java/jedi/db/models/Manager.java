@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -4088,7 +4089,7 @@ public class Manager implements IManager {
                // controla o grau de identação da instrução SQL.
                sql = sql.replaceAll("\t", "    ");
             }
-            String _sql = likeDateTime(sql);
+            String _sql = likeSqlDateTime(sql);
             if (!_sql.isEmpty()) {
                sql = _sql;
             }
@@ -4859,7 +4860,7 @@ public class Manager implements IManager {
                }
             }
          }
-         String _sql = likeDateTime(sql);
+         String _sql = likeSqlDateTime(sql);
          if (!_sql.isEmpty()) {
             sql = _sql;
          }
@@ -5478,7 +5479,7 @@ public class Manager implements IManager {
                sql = String.format(format, tableName, entityName, joins, where.isEmpty() ? "" : "WHERE\n\tNOT (" + where.trim() + ")");
                sql = sql.replaceAll("\t", "    ");
             }
-            String _sql = likeDateTime(sql);
+            String _sql = likeSqlDateTime(sql);
             if (!_sql.isEmpty()) {
                sql = _sql;
             }
@@ -6243,7 +6244,7 @@ public class Manager implements IManager {
             sql += String.format("\nOFFSET %d", _pageStart);
             sql = sql.replaceAll("\t", "    ");
          }
-         String _sql = likeDateTime(sql);
+         String _sql = likeSqlDateTime(sql);
          if (!_sql.isEmpty()) {
             sql = _sql;
          }
@@ -6602,6 +6603,40 @@ public class Manager implements IManager {
       return reversePage(pageNumber, pageSize(10), QueryPage.orderBy("-id"), (String[]) null);
    }
    
+   public String likeDateTime(String sql) {
+      sql = sql == null ? "" : sql;
+      if (!sql.isEmpty()) {
+         // TODO - substituir '//%', '%//' ou '%//%' por ''
+         // TODO - OBS: data vazia busca por todos os registros.
+         Pattern pattern = Pattern.compile(Regex.LIKE_DATETIME.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+         Matcher matcher = pattern.matcher(sql);
+         String regexp = "";
+         // System.out.println("SQL (IN): " + sql);
+         while (matcher.find()) {
+            regexp = matcher.group();
+            regexp = regexp.replaceAll("(\\w+)_(\\w+)", "$1@$2");
+            // regexp = regexp.replaceAll("[/_]", "");
+            regexp = regexp.replaceAll("[//_]", "");
+            regexp = regexp.replaceAll("@", "_");
+            regexp = regexp.replaceAll("(.*)LIKE(.*)", "DATE_FORMAT($1, '%d%m%Y %T') REGEXP$2");
+            regexp = regexp.replaceAll(" , ", ", ");
+            regexp = regexp.replaceAll("%'", "^'");
+            regexp = regexp.replaceAll("'%", "'\\$");
+            regexp = regexp.replaceAll("'(\\d*)(\\^)'", "'$2$1'");
+            regexp = regexp.replaceAll("'(\\$)(\\d*)'", "'$2$1'");
+            regexp = regexp.replace("$d", "%d");
+            if (regexp.contains("'$") && regexp.contains("^'")) {
+               regexp = regexp.replace("$", "");
+               regexp = regexp.replace("^", "");
+            }
+            // System.out.println("MySQL RegExp: " + regexp);
+            sql = sql.replace(matcher.group(), regexp);
+         }
+         // System.out.println("SQL (OUT): " + sql);
+      }
+      return sql;
+   }
+   
    private String likeDate(String sql) {
       Pattern pattern = Pattern.compile(Regex.LIKE_DATE.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
       Matcher matcher = pattern.matcher(sql);
@@ -6640,22 +6675,18 @@ public class Manager implements IManager {
       return sql;
    }
    
-   public String likeDateTime(String sql) {
+   private String likeSqlDateTime(String sql) {
       sql = sql == null ? "" : sql;
       if (!sql.isEmpty()) {
-         // TODO - substituir '//%', '%//' ou '%//%' por ''
-         // TODO - OBS: data vazia busca por todos os registros.
-         Pattern pattern = Pattern.compile(Regex.LIKE_DATETIME.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+         Pattern pattern = Pattern.compile(Regex.LIKE_SQL_DATETIME.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
          Matcher matcher = pattern.matcher(sql);
          String regexp = "";
-         // System.out.println("SQL (IN): " + sql);
          while (matcher.find()) {
             regexp = matcher.group();
             regexp = regexp.replaceAll("(\\w+)_(\\w+)", "$1@$2");
-//            regexp = regexp.replaceAll("[/_]", "");
-            regexp = regexp.replaceAll("[//_]", "");
+            regexp = regexp.replaceAll("_", "");
             regexp = regexp.replaceAll("@", "_");
-            regexp = regexp.replaceAll("(.*)LIKE(.*)", "DATE_FORMAT($1, '%d%m%Y %T') REGEXP$2");
+            regexp = regexp.replaceAll("(.*)LIKE(.*)", "DATE_FORMAT($1, '%Y-%m-%d %T') REGEXP$2");
             regexp = regexp.replaceAll(" , ", ", ");
             regexp = regexp.replaceAll("%'", "^'");
             regexp = regexp.replaceAll("'%", "'\\$");
@@ -6666,10 +6697,64 @@ public class Manager implements IManager {
                regexp = regexp.replace("$", "");
                regexp = regexp.replace("^", "");
             }
-            // System.out.println("MySQL RegExp: " + regexp);
             sql = sql.replace(matcher.group(), regexp);
          }
-         // System.out.println("SQL (OUT): " + sql);
+      }
+      return sql;
+   }
+   
+   private String likeSqlDate(String sql) {
+      sql = sql == null ? "" : sql;
+      if (!sql.isEmpty()) {
+         Pattern pattern = Pattern.compile(Regex.LIKE_SQL_DATE.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+         Matcher matcher = pattern.matcher(sql);
+         String regexp = "";
+         while (matcher.find()) {
+            regexp = matcher.group();
+            regexp = regexp.replaceAll("(\\w+)_(\\w+)", "$1@$2");
+            regexp = regexp.replaceAll("_", "");
+            regexp = regexp.replaceAll("@", "_");
+            regexp = regexp.replaceAll("(.*)LIKE(.*)", "DATE_FORMAT($1, '%Y-%m-%d') REGEXP$2");
+            regexp = regexp.replaceAll(" , ", ", ");
+            regexp = regexp.replaceAll("%'", "^'");
+            regexp = regexp.replaceAll("'%", "'\\$");
+            regexp = regexp.replaceAll("'(\\d*)(\\^)'", "'$2$1'");
+            regexp = regexp.replaceAll("'(\\$)(\\d*)'", "'$2$1'");
+            regexp = regexp.replace("$d", "%d");
+            if (regexp.contains("'$") && regexp.contains("^'")) {
+               regexp = regexp.replace("$", "");
+               regexp = regexp.replace("^", "");
+            }
+            sql = sql.replace(matcher.group(), regexp);
+         }
+      }
+      return sql;
+   }
+   
+   private String likeSqlTime(String sql) {
+      sql = sql == null ? "" : sql;
+      if (!sql.isEmpty()) {
+         Pattern pattern = Pattern.compile(Regex.LIKE_SQL_TIME.getValue(), Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+         Matcher matcher = pattern.matcher(sql);
+         String regexp = "";
+         while (matcher.find()) {
+            regexp = matcher.group();
+            regexp = regexp.replaceAll("(\\w+)_(\\w+)", "$1@$2");
+            regexp = regexp.replaceAll("_", "");
+            regexp = regexp.replaceAll("@", "_");
+            regexp = regexp.replaceAll("(.*)LIKE(.*)", "DATE_FORMAT($1, '%T') REGEXP$2");
+            regexp = regexp.replaceAll(" , ", ", ");
+            regexp = regexp.replaceAll("%'", "^'");
+            regexp = regexp.replaceAll("'%", "'\\$");
+            regexp = regexp.replaceAll("'(\\d*)(\\^)'", "'$2$1'");
+            regexp = regexp.replaceAll("'(\\$)(\\d*)'", "'$2$1'");
+            regexp = regexp.replace("$d", "%d");
+            if (regexp.contains("'$") && regexp.contains("^'")) {
+               regexp = regexp.replace("$", "");
+               regexp = regexp.replace("^", "");
+            }
+            sql = sql.replace(matcher.group(), regexp);
+         }
       }
       return sql;
    }
@@ -6694,6 +6779,44 @@ public class Manager implements IManager {
          }
       }
       return rows;
+   }
+   
+   public <T extends Model> T getRandom() {
+      T object = null;
+      int count = this.count();
+      if (count > 0) {
+         Random random = new Random();
+         int id = random.nextInt(count);
+         object = this.get("id", id);
+      }
+      return object;
+   }
+   
+   public <T extends Model> T random() {
+      return getRandom();
+   }
+   
+   public <T extends Model> List<T> getRandom(int size) {
+      List<T> objects = null;
+      if (size > 0) {
+         int count = this.count();
+         if (count > 0) {
+            Random random = new Random();
+            int id = 0;
+            T object = null;
+            objects = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+               id = random.nextInt(count);
+               object = this.get("id", id);
+               objects.add(object);
+            }
+         }
+      }
+      return objects;
+   }
+   
+   public <T extends Model> List<T> random(int size) {
+      return getRandom(size);
    }
    
    // QuerySet API Reference
