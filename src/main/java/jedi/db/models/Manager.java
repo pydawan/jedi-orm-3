@@ -63,10 +63,11 @@ public class Manager implements IManager {
    private boolean autoCloseConnection = JediEngine.AUTO_CLOSE.isValue();
    
    private String tableName;
+   private String entityName;
+   private String exceptionMessage;
    private Connection connection;
    private List<List<Map<String, Object>>> resultSet = new ArrayList<>();
    private StringBuilder sql = new StringBuilder();
-   private String entityName;
    
    public Class<? extends Model> entity;
    
@@ -6786,7 +6787,7 @@ public class Manager implements IManager {
       int count = this.count();
       if (count > 0) {
          Random random = new Random();
-         int id = random.nextInt(count);
+         int id = random.nextInt(count) + 1;
          object = this.get("id", id);
       }
       return object;
@@ -6796,20 +6797,23 @@ public class Manager implements IManager {
       return getRandom();
    }
    
-   public <T extends Model> List<T> getRandom(int size) {
+   private <T extends Model> List<T> getRandom(int size) {
       List<T> objects = null;
       if (size > 0) {
          int count = this.count();
-         if (count > 0) {
+         if (count >= size) {
             Random random = new Random();
             int id = 0;
             T object = null;
             objects = new ArrayList<>();
             for (int i = 0; i < size; i++) {
-               id = random.nextInt(count);
+               id = random.nextInt(count) + 1;
                object = this.get("id", id);
                objects.add(object);
             }
+         } else {
+            exceptionMessage = "ATENÇÃO: A quantidade de registros gravados na tabela é menor que o parâmetro size!";
+            throw new IllegalStateException(exceptionMessage);
          }
       }
       return objects;
@@ -6817,6 +6821,33 @@ public class Manager implements IManager {
    
    public <T extends Model> List<T> random(int size) {
       return getRandom(size);
+   }
+   
+   public <T extends Model> List<T> getDistinctRandom(int size) {
+      List<T> objects = null;
+      if (size > 0) {
+         int count = this.count();
+         if (count >= size) {
+            Random random = new Random();
+            StringBuilder ids = new StringBuilder();
+            int randomInt = 0;
+            for (int i = 0; i < size; i++) {
+               randomInt = random.nextInt(count) + 1;
+               ids.append(randomInt + ", ");
+            }
+            ids.deleteCharAt(ids.length() - 2);
+            String criteria = String.format("id__in=[%s]", ids.toString());
+            objects = this.filter(criteria);
+         } else {
+            exceptionMessage = "ATENÇÃO: A quantidade de registros gravados na tabela é menor que o parâmetro size!";
+            throw new IllegalStateException(exceptionMessage);
+         }
+      }
+      return objects;
+   }
+   
+   public <T extends Model> List<T> distinctRandom(int size) {
+      return getDistinctRandom(size);
    }
    
    // QuerySet API Reference
