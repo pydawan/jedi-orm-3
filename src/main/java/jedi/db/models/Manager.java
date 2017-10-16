@@ -179,8 +179,8 @@ public class Manager implements IManager {
             // Oracle returns BigDecimal object.
             if (connection.toString().startsWith("oracle")) {
                id.set(
-                  obj,
-                  ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1))).intValue());
+                     obj,
+                     ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1))).intValue());
             } else {
                // MySQL and PostgreSQL returns a Integer object.
                id.set(obj, resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
@@ -240,25 +240,25 @@ public class Manager implements IManager {
                         Class intermediateModelClass = Class.forName(intermediateModelclassName);
                         String intermediateTableName = ((Model) intermediateModelClass.newInstance()).getTableName();
                         querySetAssociatedModels = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s WHERE %s_id = %d)",
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(model),
-                              intermediateTableName,
-                              TableUtil.getColumnName(obj.getClass()),
-                              ((Model) obj).getId()),
-                           associatedModelClass);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s WHERE %s_id = %d)",
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(model),
+                                    intermediateTableName,
+                                    TableUtil.getColumnName(obj.getClass()),
+                                    ((Model) obj).getId()),
+                              associatedModelClass);
                      } else {
                         querySetAssociatedModels = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(model),
-                              tableName,
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(obj.getClass()),
-                              ((Model) obj).getId()),
-                           associatedModelClass);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(model),
+                                    tableName,
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(obj.getClass()),
+                                    ((Model) obj).getId()),
+                              associatedModelClass);
                      }
                      field.set(obj, querySetAssociatedModels);
                   } else {
@@ -285,7 +285,7 @@ public class Manager implements IManager {
                } else {
                   // Sets the fields that aren't Model instances.
                   if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                     connection.toString().startsWith("oracle")) {
+                        connection.toString().startsWith("oracle")) {
                      if (resultSet.getObject(TableUtil.getColumnName(field)) == null) {
                         field.set(obj, 0);
                      } else {
@@ -394,10 +394,10 @@ public class Manager implements IManager {
                // Checks if the current pair contains __startswith, __contains
                // or __endswith.
                if (fields[i].indexOf("__startswith") > -1 || fields[i].indexOf("__!startswith") > -1 ||
-                  fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
-                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__icontains") > -1 || fields[i].indexOf("__!contains") > -1 ||
-                  fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
-                  fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
+                     fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
+                     fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__icontains") > -1 || fields[i].indexOf("__!contains") > -1 ||
+                     fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
+                     fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
                   // Creates a LIKE statement in SQL.
                   if (fields[i].indexOf("__startswith") > -1) {
                      fields[i] = fields[i].replace("__startswith = ", " LIKE ");
@@ -567,9 +567,11 @@ public class Manager implements IManager {
                      continue;
                   }
                   // Discards the serialVersionUID field.
-                  if (field.getName().equals("serialVersionUID")) continue;
+                  if (field.getName().equals("serialVersionUID"))
+                     continue;
                   // Discards the objects field.
-                  if (field.getName().equalsIgnoreCase("objects")) continue;
+                  if (field.getName().equalsIgnoreCase("objects"))
+                     continue;
                   // Checks if the field are annotated as OneToOneField,
                   // ForeignKeyField or ManyToManyField.
                   oneToOneFieldAnnotation = field.getAnnotation(OneToOneField.class);
@@ -609,13 +611,13 @@ public class Manager implements IManager {
                         List<List<Map<String, Object>>> recordSet = null;
                         // Performs a SQL query.
                         recordSet = manager.raw(
-                           String.format(
-                              "SELECT %s_id FROM %s_%s WHERE %s_id = %d",
-                              TableUtil.getColumnName(model),
-                              tableName,
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(this.entity),
-                              ((Model) obj).id()));
+                              String.format(
+                                    "SELECT %s_id FROM %s_%s WHERE %s_id = %d",
+                                    TableUtil.getColumnName(model),
+                                    tableName,
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(this.entity),
+                                    ((Model) obj).id()));
                         String args = recordSet.toString();
                         args = args.replace("[", "");
                         args = args.replace("{", "");
@@ -654,7 +656,7 @@ public class Manager implements IManager {
                   } else {
                      // Sets fields the aren't Model's instances.
                      if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                        connection.toString().startsWith("oracle")) {
+                           connection.toString().startsWith("oracle")) {
                         if (resultSet.getObject(TableUtil.getColumnName(field.getName())) == null) {
                            field.set(obj, 0);
                         } else {
@@ -770,9 +772,11 @@ public class Manager implements IManager {
                   continue;
                }
                // Discards serialVersionUID field.
-               if (f.getName().equals("serialVersionUID")) continue;
+               if (f.getName().equals("serialVersionUID"))
+                  continue;
                // Discards objects field.
-               if (f.getName().equalsIgnoreCase("objects")) continue;
+               if (f.getName().equalsIgnoreCase("objects"))
+                  continue;
                // Converts the data to the appropriate type.
                if (value.matches("\\d+")) {
                   if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
@@ -839,7 +843,7 @@ public class Manager implements IManager {
          String databaseEngine = JediEngine.DATABASE_ENGINE;
          if (databaseEngine != null) {
             if (databaseEngine.trim().equalsIgnoreCase("mysql") || databaseEngine.trim().equalsIgnoreCase("postgresql") ||
-               databaseEngine.trim().equalsIgnoreCase("h2")) {
+                  databaseEngine.trim().equalsIgnoreCase("h2")) {
                sql = String.format("SELECT id FROM %s ORDER BY id DESC LIMIT 1", tableName);
             } else if (databaseEngine.trim().equalsIgnoreCase("oracle")) {
                sql = String.format("SELECT MAX(id) AS id FROM %s", tableName);
@@ -911,11 +915,11 @@ public class Manager implements IManager {
                   // Checks if the current pair contains __startswith,
                   // __contains or __endswith.
                   if (conditions[i].indexOf("__startswith") > -1 || conditions[i].indexOf("__!startswith") > -1 ||
-                     conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
-                     conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
-                     conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
-                     conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
-                     conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
+                        conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
+                        conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
+                        conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
+                        conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
+                        conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
                      // Creates the LIKE SQL statement.
                      if (conditions[i].indexOf("__startswith") > -1) {
                         conditions[i] = conditions[i].replace("__startswith = ", " LIKE ");
@@ -1114,9 +1118,9 @@ public class Manager implements IManager {
                // Creates the column name.
                if (fields[i].contains("=")) {
                   fields[i] = String.format(
-                     "%s%s",
-                     TableUtil.getColumnName(fields[i].substring(0, fields[i].lastIndexOf("="))),
-                     fields[i].substring(fields[i].lastIndexOf("=")));
+                        "%s%s",
+                        TableUtil.getColumnName(fields[i].substring(0, fields[i].lastIndexOf("="))),
+                        fields[i].substring(fields[i].lastIndexOf("=")));
                }
                // Adds a blank space between the field name and value.
                fields[i] = fields[i].replace("=", " = ");
@@ -1128,10 +1132,10 @@ public class Manager implements IManager {
                // Checks if the current pair contains __startswith, __contains
                // ou __endswith.
                if (fields[i].indexOf("__startswith") > -1 || fields[i].indexOf("__!startswith") > -1 ||
-                  fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
-                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__!contains") > -1 || fields[i].indexOf("__icontains") > -1 ||
-                  fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
-                  fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
+                     fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
+                     fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__!contains") > -1 || fields[i].indexOf("__icontains") > -1 ||
+                     fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
+                     fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
                   // Creates a LIKE SQL statement.
                   if (fields[i].indexOf("__startswith") > -1) {
                      fields[i] = fields[i].replace("__startswith = ", " LIKE ");
@@ -1290,9 +1294,9 @@ public class Manager implements IManager {
                   id.setAccessible(true);
                   if (connection.toString().startsWith("oracle")) {
                      id.set(
-                        obj,
-                        ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
-                           .intValue());
+                           obj,
+                           ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
+                                 .intValue());
                   } else {
                      id.set(obj, resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
                   }
@@ -1344,15 +1348,15 @@ public class Manager implements IManager {
                         Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, model));
                         manager = new Manager(associatedModelClass);
                         QuerySet querySetAssociatedModels = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
-                              references,
-                              model,
-                              tableName,
-                              references,
-                              TableUtil.getColumnName(obj.getClass()),
-                              ((Model) obj).getId()),
-                           associatedModelClass);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                                    references,
+                                    model,
+                                    tableName,
+                                    references,
+                                    TableUtil.getColumnName(obj.getClass()),
+                                    ((Model) obj).getId()),
+                              associatedModelClass);
                         field.set(obj, querySetAssociatedModels);
                      } else {
                         field.set(obj, null);
@@ -1367,14 +1371,14 @@ public class Manager implements IManager {
                         Class associatedModelClass = Class.forName(field.getType().getName());
                         manager = new Manager(associatedModelClass);
                         Model associatedModel = manager
-                           .get(String.format("id"), resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
+                              .get(String.format("id"), resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
                         field.set(obj, associatedModel);
                      } else {
                         field.set(obj, null);
                      }
                   } else {
                      if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                        connection.toString().startsWith("oracle")) {
+                           connection.toString().startsWith("oracle")) {
                         if (resultSet.getObject(TableUtil.getColumnName(field)) == null) {
                            field.set(obj, 0);
                         } else {
@@ -1469,7 +1473,7 @@ public class Manager implements IManager {
                         HashMap<String, Object> tableColumn = new HashMap<String, Object>();
                         for (int i = 1; i <= tableMetadata.getColumnCount(); i++) {
                            if (_sql.contains("inner join") || _sql.contains("left join") || _sql.contains("right join") ||
-                              _sql.contains("full outer join")) {
+                                 _sql.contains("full outer join")) {
                               key = String.format("%s.%s", tableMetadata.getTableName(i), tableMetadata.getColumnName(i));
                               tableColumn.put(key, resultSet.getObject(key));
                            } else {
@@ -1562,7 +1566,7 @@ public class Manager implements IManager {
                         Class associatedModelClass = Class.forName(field.getType().getName());
                         manager = new Manager(associatedModelClass);
                         Model associatedModel = manager
-                           .get(String.format("id"), rs.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
+                              .get(String.format("id"), rs.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
                         field.set(o, associatedModel);
                      } else {
                         field.set(o, null);
@@ -1599,13 +1603,13 @@ public class Manager implements IManager {
                         // Associated model record set.
                         List<List<Map<String, Object>>> amrs = null;
                         amrs = manager.raw(
-                           String.format(
-                              "SELECT %s_id FROM %s_%s WHERE %s_id = %d",
-                              TableUtil.getColumnName(model),
-                              tableName,
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(clazz),
-                              o.id()));
+                              String.format(
+                                    "SELECT %s_id FROM %s_%s WHERE %s_id = %d",
+                                    TableUtil.getColumnName(model),
+                                    tableName,
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(clazz),
+                                    o.id()));
                         if (amrs != null) {
                            String args = amrs.toString().toLowerCase();
                            args = args.replace("[", "");
@@ -1627,7 +1631,7 @@ public class Manager implements IManager {
                   } else {
                      // Configura campos que não são instancias de model.
                      if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                        connection.toString().startsWith("oracle")) {
+                           connection.toString().startsWith("oracle")) {
                         if (rs.getObject(TableUtil.getColumnName(field)) == null) {
                            field.set(o, 0);
                         } else {
@@ -1694,7 +1698,7 @@ public class Manager implements IManager {
     * @throws MultipleObjectsReturnedException
     */
    private <T extends Model> T get(String field, Object value, Class<T> modelClass)
-      throws ObjectDoesNotExistException, MultipleObjectsReturnedException {
+         throws ObjectDoesNotExistException, MultipleObjectsReturnedException {
       T model = null;
       String columnName = "";
       Object o = null;
@@ -1734,13 +1738,13 @@ public class Manager implements IManager {
                throw new DoesNotExistException(String.format("%s matching query does not exist.", this.entity.getSimpleName()));
             } else if (rowCount > 1) {
                throw new MultipleObjectsReturnedException(
-                  String.format(
-                     "get() returned more than one %s --\n    it returned %d! %s {'%s': '%s'}",
-                     this.entity.getSimpleName(),
-                     rowCount,
-                     "Lookup parameters were",
-                     field,
-                     value));
+                     String.format(
+                           "get() returned more than one %s --\n    it returned %d! %s {'%s': '%s'}",
+                           this.entity.getSimpleName(),
+                           rowCount,
+                           "Lookup parameters were",
+                           field,
+                           value));
             }
             resultSet.beforeFirst();
             while (resultSet.next()) {
@@ -1765,8 +1769,10 @@ public class Manager implements IManager {
                   if (!JediEngine.isJediField(f)) {
                      continue;
                   }
-                  if (f.getName().equals("serialVersionUID")) continue;
-                  if (f.getName().equalsIgnoreCase("objects")) continue;
+                  if (f.getName().equals("serialVersionUID"))
+                     continue;
+                  if (f.getName().equalsIgnoreCase("objects"))
+                     continue;
                   oneToOneFieldAnnotation = f.getAnnotation(OneToOneField.class);
                   foreignKeyFieldAnnotation = f.getAnnotation(ForeignKeyField.class);
                   manyToManyFieldAnnotation = f.getAnnotation(ManyToManyField.class);
@@ -1807,15 +1813,15 @@ public class Manager implements IManager {
                         Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, referencedModel));
                         manager = new Manager(associatedModelClass);
                         QuerySet associatedModelsQuerySet = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
-                              referencedTable,
-                              referencedModel.toLowerCase(),
-                              tableName,
-                              referencedTable,
-                              TableUtil.getColumnName(model.getClass()),
-                              model.getId()),
-                           associatedModelClass);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                                    referencedTable,
+                                    referencedModel.toLowerCase(),
+                                    tableName,
+                                    referencedTable,
+                                    TableUtil.getColumnName(model.getClass()),
+                                    model.getId()),
+                              associatedModelClass);
                         // Configurando o campo (atributo) com a referência
                         // para o queryset criado anteriormente.
                         f.set(model, associatedModelsQuerySet);
@@ -1854,7 +1860,7 @@ public class Manager implements IManager {
                      // Configurando campos que não são instancias de
                      // Model.
                      if ((f.getType().getSimpleName().equals("int") || f.getType().getSimpleName().equals("Integer")) &&
-                        connection.toString().startsWith("oracle")) {
+                           connection.toString().startsWith("oracle")) {
                         columnName = TableUtil.getColumnName(f.getName());
                         o = resultSet.getObject(columnName);
                         if (o == null) {
@@ -1890,7 +1896,7 @@ public class Manager implements IManager {
                            // TODO - Refatoração mudança de jedi.types.DateTime
                            // para java.util.Date
                            // o = new DateTime(((Timestamp) o).getTime());
-//                           o = new Date(((Timestamp) o).getTime());
+                           // o = new Date(((Timestamp) o).getTime());
                            Timestamp timestamp = (Timestamp) o;
                            Calendar calendar = Calendar.getInstance();
                            calendar.setTimeInMillis(timestamp.getTime());
@@ -1939,7 +1945,7 @@ public class Manager implements IManager {
     * @throws MultipleObjectsReturnedException
     */
    private <T extends Model> T get(Class<T> clazz, String... fieldLookups)
-      throws ObjectDoesNotExistException, MultipleObjectsReturnedException {
+         throws ObjectDoesNotExistException, MultipleObjectsReturnedException {
       T model = null;
       if (fieldLookups != null) {
          StringBuilder _sql = new StringBuilder();
@@ -1972,12 +1978,12 @@ public class Manager implements IManager {
                model = list.get(0);
             } else if (list.size() > 1) {
                throw new MultipleObjectsReturnedException(
-                  String.format(
-                     "get() returned more than one %s --\n    it returned %d! %s {%s}",
-                     this.entity.getSimpleName(),
-                     list.size(),
-                     "Lookup parameters were",
-                     _fieldLookups));
+                     String.format(
+                           "get() returned more than one %s --\n    it returned %d! %s {%s}",
+                           this.entity.getSimpleName(),
+                           list.size(),
+                           "Lookup parameters were",
+                           _fieldLookups));
             } else {
                throw new ObjectDoesNotExistException(String.format("%s matching query does not exist.", this.entity.getSimpleName()));
             }
@@ -2109,19 +2115,19 @@ public class Manager implements IManager {
          }
          if (querySet == null) {
             sql = String.format(
-               "SELECT %s.* FROM %s, %s_%s WHERE %s.id = %s_%s.%s_id AND %s_%s.%s_id = %d",
-               tableName,
-               tableName,
-               tableName,
-               tableNameAssociatedModel,
-               tableName,
-               tableName,
-               tableNameAssociatedModel,
-               TableUtil.getColumnName(this.entity),
-               tableName,
-               tableNameAssociatedModel,
-               TableUtil.getColumnName(associatedModelClass),
-               id);
+                  "SELECT %s.* FROM %s, %s_%s WHERE %s.id = %s_%s.%s_id AND %s_%s.%s_id = %d",
+                  tableName,
+                  tableName,
+                  tableName,
+                  tableNameAssociatedModel,
+                  tableName,
+                  tableName,
+                  tableNameAssociatedModel,
+                  TableUtil.getColumnName(this.entity),
+                  tableName,
+                  tableNameAssociatedModel,
+                  TableUtil.getColumnName(associatedModelClass),
+                  id);
             querySet = (QuerySet<S>) this.raw(sql, this.entity);
          }
       }
@@ -2358,7 +2364,7 @@ public class Manager implements IManager {
                            col = metadata.getColumnLabel(i);
                            val = rs.getObject(col);
                            if (_sql.contains("inner join") || _sql.contains("left outer join") || _sql.contains("right outer join") ||
-                              _sql.contains("full outer join")) {
+                                 _sql.contains("full outer join")) {
                               tb = metadata.getTableName(i);
                               column.put(String.format("%s_%s", tb, col), val);
                            } else {
@@ -2422,10 +2428,14 @@ public class Manager implements IManager {
    private <T extends Model> QuerySet<T> distinct(Class<T> clazz, String... fields) {
       QuerySet<T> qs = new QuerySet<T>();
       qs.setEntity((Class<T>) this.entity);
-      if (clazz == null) return qs;
-      if (fields == null) return qs;
-      if (fields.length == 0) return qs;
-      if (connect() == null) return qs;
+      if (clazz == null)
+         return qs;
+      if (fields == null)
+         return qs;
+      if (fields.length == 0)
+         return qs;
+      if (connect() == null)
+         return qs;
       try {
          StringBuilder sb = new StringBuilder();
          sb.append("select\n");
@@ -2534,25 +2544,25 @@ public class Manager implements IManager {
                         // Intermediate table name.
                         String itn = ((Model) imc.newInstance()).getTableName();
                         qsam = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s WHERE %s_id = %d)",
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(model),
-                              itn,
-                              TableUtil.getColumnName(o.getClass()),
-                              ((Model) o).getId()),
-                           amc);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s WHERE %s_id = %d)",
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(model),
+                                    itn,
+                                    TableUtil.getColumnName(o.getClass()),
+                                    ((Model) o).getId()),
+                              amc);
                      } else {
                         qsam = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(model),
-                              tableName,
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(o.getClass()),
-                              ((Model) o).getId()),
-                           amc);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(model),
+                                    tableName,
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(o.getClass()),
+                                    ((Model) o).getId()),
+                              amc);
                      }
                      field.set(o, qsam);
                   } else {
@@ -2576,7 +2586,7 @@ public class Manager implements IManager {
                   }
                } else {
                   if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                     this.connection.toString().startsWith("oracle")) {
+                        this.connection.toString().startsWith("oracle")) {
                      if (rs.getObject(TableUtil.getColumnName(field)) == null) {
                         field.set(o, 0);
                      } else {
@@ -2650,10 +2660,14 @@ public class Manager implements IManager {
    private <T extends Model> QuerySet<T> orderBy(Class<T> clazz, String... fields) {
       QuerySet<T> qs = new QuerySet<T>();
       qs.setEntity((Class<T>) this.entity);
-      if (clazz == null) return qs;
-      if (fields == null) return qs;
-      if (fields.length == 0) return qs;
-      if (connect() == null) return qs;
+      if (clazz == null)
+         return qs;
+      if (fields == null)
+         return qs;
+      if (fields.length == 0)
+         return qs;
+      if (connect() == null)
+         return qs;
       try {
          StringBuilder sb = new StringBuilder();
          sb.append("select\n");
@@ -2755,25 +2769,25 @@ public class Manager implements IManager {
                         // Intermediate table name.
                         String itn = ((Model) imc.newInstance()).getTableName();
                         qsam = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s WHERE %s_id = %d)",
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(model),
-                              itn,
-                              TableUtil.getColumnName(o.getClass()),
-                              ((Model) o).getId()),
-                           amc);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s WHERE %s_id = %d)",
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(model),
+                                    itn,
+                                    TableUtil.getColumnName(o.getClass()),
+                                    ((Model) o).getId()),
+                              amc);
                      } else {
                         qsam = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(model),
-                              tableName,
-                              TableUtil.getTableName(references),
-                              TableUtil.getColumnName(o.getClass()),
-                              ((Model) o).getId()),
-                           amc);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(model),
+                                    tableName,
+                                    TableUtil.getTableName(references),
+                                    TableUtil.getColumnName(o.getClass()),
+                                    ((Model) o).getId()),
+                              amc);
                      }
                      field.set(o, qsam);
                   } else {
@@ -2797,7 +2811,7 @@ public class Manager implements IManager {
                   }
                } else {
                   if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                     this.connection.toString().startsWith("oracle")) {
+                        this.connection.toString().startsWith("oracle")) {
                      if (rs.getObject(TableUtil.getColumnName(field)) == null) {
                         field.set(o, 0);
                      } else {
@@ -3146,11 +3160,11 @@ public class Manager implements IManager {
             // Checks if the current pair contains __startswith, __contains
             // or __endswith.
             if (conditions[i].indexOf("__startswith") > -1 || conditions[i].indexOf("__!startswith") > -1 ||
-               conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
-               conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
-               conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
-               conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
-               conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
+                  conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
+                  conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
+                  conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
+                  conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
+                  conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
                // Creates the LIKE SQL statement.
                if (conditions[i].indexOf("__startswith") > -1) {
                   conditions[i] = conditions[i].replace("__startswith = ", " LIKE ");
@@ -3322,8 +3336,10 @@ public class Manager implements IManager {
                if (!JediEngine.isJediField(field)) {
                   continue;
                }
-               if (field.getName().equals("serialVersionUID")) continue;
-               if (field.getName().equalsIgnoreCase("objects")) continue;
+               if (field.getName().equals("serialVersionUID"))
+                  continue;
+               if (field.getName().equalsIgnoreCase("objects"))
+                  continue;
                oneToOneFieldAnnotation = field.getAnnotation(OneToOneField.class);
                foreignKeyFieldAnnotation = field.getAnnotation(ForeignKeyField.class);
                manyToManyFieldAnnotation = field.getAnnotation(ManyToManyField.class);
@@ -3360,13 +3376,13 @@ public class Manager implements IManager {
                      manager = new Manager(associatedModelClass);
                      List<List<Map<String, Object>>> recordSet = null;
                      recordSet = manager.raw(
-                        String.format(
-                           "SELECT %s_id FROM %s_%s WHERE %s_id = %d",
-                           TableUtil.getColumnName(model),
-                           tableName,
-                           TableUtil.getTableName(references),
-                           TableUtil.getColumnName(this.entity),
-                           ((Model) obj).id()));
+                           String.format(
+                                 "SELECT %s_id FROM %s_%s WHERE %s_id = %d",
+                                 TableUtil.getColumnName(model),
+                                 tableName,
+                                 TableUtil.getTableName(references),
+                                 TableUtil.getColumnName(this.entity),
+                                 ((Model) obj).id()));
                      String args = recordSet.toString();
                      args = args.replace("[", "");
                      args = args.replace("{", "");
@@ -3399,7 +3415,7 @@ public class Manager implements IManager {
                   }
                } else {
                   if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                     this.connection.toString().startsWith("oracle")) {
+                        this.connection.toString().startsWith("oracle")) {
                      if (resultSet.getObject(TableUtil.getColumnName(field.getName())) == null) {
                         field.set(obj, 0);
                      } else {
@@ -3558,10 +3574,10 @@ public class Manager implements IManager {
                // Checks if the current pair contains __startswith, __contains
                // or __endswith.
                if (fields[i].indexOf("__startswith") > -1 || fields[i].indexOf("__!startswith") > -1 ||
-                  fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
-                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__icontains") > -1 || fields[i].indexOf("__!contains") > -1 ||
-                  fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
-                  fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
+                     fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
+                     fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__icontains") > -1 || fields[i].indexOf("__!contains") > -1 ||
+                     fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
+                     fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
                   // Creates a LIKE statement in SQL.
                   if (fields[i].indexOf("__startswith") > -1) {
                      fields[i] = fields[i].replace("__startswith = ", " LIKE ");
@@ -4125,9 +4141,11 @@ public class Manager implements IManager {
                      continue;
                   }
                   // Discards the serialVersionUID field.
-                  if (field.getName().equals("serialVersionUID")) continue;
+                  if (field.getName().equals("serialVersionUID"))
+                     continue;
                   // Discards the objects field.
-                  if (field.getName().equalsIgnoreCase("objects")) continue;
+                  if (field.getName().equalsIgnoreCase("objects"))
+                     continue;
                   // Checks if the field are annotated as OneToOneField,
                   // ForeignKeyField or ManyToManyField.
                   oneToOneFieldAnnotation = field.getAnnotation(OneToOneField.class);
@@ -4173,7 +4191,9 @@ public class Manager implements IManager {
                               tableName,
                               TableUtil.getTableName(references),
                               TableUtil.getColumnName(this.entity),
-                              ((Model) obj).id()));
+                              ((Model) obj).id()
+                           )
+                        );
                         String args = recordSet.toString();
                         args = args.replace("[", "");
                         args = args.replace("{", "");
@@ -4212,7 +4232,7 @@ public class Manager implements IManager {
                   } else {
                      // Sets fields the aren't Model's instances.
                      if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                        connection.toString().startsWith("oracle")) {
+                           connection.toString().startsWith("oracle")) {
                         if (resultSet.getObject(TableUtil.getColumnName(field.getName())) == null) {
                            field.set(obj, 0);
                         } else {
@@ -4325,11 +4345,11 @@ public class Manager implements IManager {
                   // Checks if the current pair contains __startswith,
                   // __contains or __endswith.
                   if (conditions[i].indexOf("__startswith") > -1 || conditions[i].indexOf("__!startswith") > -1 ||
-                     conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
-                     conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
-                     conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
-                     conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
-                     conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
+                        conditions[i].indexOf("__istartswith") > -1 || conditions[i].indexOf("__!istartswith") > -1 ||
+                        conditions[i].indexOf("__contains") > -1 || conditions[i].indexOf("__!contains") > -1 ||
+                        conditions[i].indexOf("__icontains") > -1 || conditions[i].indexOf("__!icontains") > -1 ||
+                        conditions[i].indexOf("__endswith") > -1 || conditions[i].indexOf("__!endswith") > -1 ||
+                        conditions[i].indexOf("__iendswith") > -1 || conditions[i].indexOf("__!iendswith") > -1) {
                      // Creates the LIKE SQL statement.
                      if (conditions[i].indexOf("__startswith") > -1) {
                         conditions[i] = conditions[i].replace("__startswith = ", " LIKE ");
@@ -4932,9 +4952,9 @@ public class Manager implements IManager {
                // Creates the column name.
                if (fields[i].contains("=")) {
                   fields[i] = String.format(
-                     "%s%s",
-                     TableUtil.getColumnName(fields[i].substring(0, fields[i].lastIndexOf("="))),
-                     fields[i].substring(fields[i].lastIndexOf("=")));
+                        "%s%s",
+                        TableUtil.getColumnName(fields[i].substring(0, fields[i].lastIndexOf("="))),
+                        fields[i].substring(fields[i].lastIndexOf("=")));
                }
                // Adds a blank space between the field name and value.
                fields[i] = fields[i].replace("=", " = ");
@@ -4946,10 +4966,10 @@ public class Manager implements IManager {
                // Checks if the current pair contains __startswith, __contains
                // ou __endswith.
                if (fields[i].indexOf("__startswith") > -1 || fields[i].indexOf("__!startswith") > -1 ||
-                  fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
-                  fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__!contains") > -1 || fields[i].indexOf("__icontains") > -1 ||
-                  fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
-                  fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
+                     fields[i].indexOf("__istartswith") > -1 || fields[i].indexOf("__!istartswith") > -1 ||
+                     fields[i].indexOf("__contains") > -1 || fields[i].indexOf("__!contains") > -1 || fields[i].indexOf("__icontains") > -1 ||
+                     fields[i].indexOf("__!icontains") > -1 || fields[i].indexOf("__endswith") > -1 || fields[i].indexOf("__!endswith") > -1 ||
+                     fields[i].indexOf("__iendswith") > -1 || fields[i].indexOf("__!iendswith") > -1) {
                   // Creates a LIKE SQL statement.
                   if (fields[i].indexOf("__startswith") > -1) {
                      fields[i] = fields[i].replace("__startswith = ", " LIKE ");
@@ -5501,9 +5521,9 @@ public class Manager implements IManager {
                   id.setAccessible(true);
                   if (connection.toString().startsWith("oracle")) {
                      id.set(
-                        obj,
-                        ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
-                           .intValue());
+                           obj,
+                           ((java.math.BigDecimal) resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)))
+                                 .intValue());
                   } else {
                      id.set(obj, resultSet.getObject(id.toString().substring(id.toString().lastIndexOf('.') + 1)));
                   }
@@ -5555,15 +5575,15 @@ public class Manager implements IManager {
                         Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, model));
                         manager = new Manager(associatedModelClass);
                         QuerySet querySetAssociatedModels = manager.raw(
-                           String.format(
-                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
-                              references,
-                              model,
-                              tableName,
-                              references,
-                              TableUtil.getColumnName(obj.getClass()),
-                              ((Model) obj).getId()),
-                           associatedModelClass);
+                              String.format(
+                                    "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                                    references,
+                                    model,
+                                    tableName,
+                                    references,
+                                    TableUtil.getColumnName(obj.getClass()),
+                                    ((Model) obj).getId()),
+                              associatedModelClass);
                         field.set(obj, querySetAssociatedModels);
                      } else {
                         field.set(obj, null);
@@ -5578,14 +5598,14 @@ public class Manager implements IManager {
                         Class associatedModelClass = Class.forName(field.getType().getName());
                         manager = new Manager(associatedModelClass);
                         Model associatedModel = manager
-                           .get(String.format("id"), resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
+                              .get(String.format("id"), resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(field))));
                         field.set(obj, associatedModel);
                      } else {
                         field.set(obj, null);
                      }
                   } else {
                      if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                        connection.toString().startsWith("oracle")) {
+                           connection.toString().startsWith("oracle")) {
                         if (resultSet.getObject(TableUtil.getColumnName(field)) == null) {
                            field.set(obj, 0);
                         } else {
@@ -5640,7 +5660,7 @@ public class Manager implements IManager {
    }
    
    public <T extends Model> QuerySet<T> page(QueryPageStart pageStart, QueryPageSize pageSize, QueryPageOrder pageOrder,
-      String... filters) {
+         String... filters) {
       Integer _pageStart = pageStart == null ? 0 : pageStart.get();
       Integer _pageSize = pageSize == null ? 0 : pageSize.get();
       boolean reverseOrder = SortOrder.isDescending(pageOrder);
@@ -5701,10 +5721,10 @@ public class Manager implements IManager {
             // Checks if the current pair contains __startswith, __contains
             // or __endswith.
             if (filters[i].indexOf("__startswith") > -1 || filters[i].indexOf("__!startswith") > -1 ||
-               filters[i].indexOf("__istartswith") > -1 || filters[i].indexOf("__!istartswith") > -1 ||
-               filters[i].indexOf("__contains") > -1 || filters[i].indexOf("__!contains") > -1 || filters[i].indexOf("__icontains") > -1 ||
-               filters[i].indexOf("__!icontains") > -1 || filters[i].indexOf("__endswith") > -1 || filters[i].indexOf("__!endswith") > -1 ||
-               filters[i].indexOf("__iendswith") > -1 || filters[i].indexOf("__!iendswith") > -1) {
+                  filters[i].indexOf("__istartswith") > -1 || filters[i].indexOf("__!istartswith") > -1 ||
+                  filters[i].indexOf("__contains") > -1 || filters[i].indexOf("__!contains") > -1 || filters[i].indexOf("__icontains") > -1 ||
+                  filters[i].indexOf("__!icontains") > -1 || filters[i].indexOf("__endswith") > -1 || filters[i].indexOf("__!endswith") > -1 ||
+                  filters[i].indexOf("__iendswith") > -1 || filters[i].indexOf("__!iendswith") > -1) {
                // Creates the LIKE SQL statement.
                if (filters[i].indexOf("__startswith") > -1) {
                   filters[i] = filters[i].replace("__startswith = ", " LIKE ");
@@ -6239,7 +6259,7 @@ public class Manager implements IManager {
             sql += String.format("\n%s", joins);
             sql += String.format("WHERE\n\t%s", where);
             orderBy = reverseOrder == false
-               ? String.format("\nORDER BY\n\t%s.id ASC", entityName) : String.format("\nORDER BY\n\t%s.id DESC", entityName);
+                  ? String.format("\nORDER BY\n\t%s.id ASC", entityName) : String.format("\nORDER BY\n\t%s.id DESC", entityName);
             sql += orderBy;
             sql += String.format("\nLIMIT %d", _pageSize);
             sql += String.format("\nOFFSET %d", _pageStart);
@@ -6276,8 +6296,10 @@ public class Manager implements IManager {
                if (!JediEngine.isJediField(field)) {
                   continue;
                }
-               if (field.getName().equals("serialVersionUID")) continue;
-               if (field.getName().equalsIgnoreCase("objects")) continue;
+               if (field.getName().equals("serialVersionUID"))
+                  continue;
+               if (field.getName().equalsIgnoreCase("objects"))
+                  continue;
                oneToOneFieldAnnotation = field.getAnnotation(OneToOneField.class);
                foreignKeyFieldAnnotation = field.getAnnotation(ForeignKeyField.class);
                manyToManyFieldAnnotation = field.getAnnotation(ManyToManyField.class);
@@ -6314,13 +6336,13 @@ public class Manager implements IManager {
                      manager = new Manager(associatedModelClass);
                      List<List<Map<String, Object>>> recordSet = null;
                      recordSet = manager.raw(
-                        String.format(
-                           "SELECT %s_id FROM %s_%s WHERE %s_id = %d",
-                           TableUtil.getColumnName(model),
-                           tableName,
-                           TableUtil.getTableName(references),
-                           TableUtil.getColumnName(this.entity),
-                           ((Model) obj).id()));
+                           String.format(
+                                 "SELECT %s_id FROM %s_%s WHERE %s_id = %d",
+                                 TableUtil.getColumnName(model),
+                                 tableName,
+                                 TableUtil.getTableName(references),
+                                 TableUtil.getColumnName(this.entity),
+                                 ((Model) obj).id()));
                      String args = recordSet.toString();
                      args = args.replace("[", "");
                      args = args.replace("{", "");
@@ -6353,7 +6375,7 @@ public class Manager implements IManager {
                   }
                } else {
                   if ((field.getType().getSimpleName().equals("int") || field.getType().getSimpleName().equals("Integer")) &&
-                     connection.toString().startsWith("oracle")) {
+                        connection.toString().startsWith("oracle")) {
                      if (resultSet.getObject(TableUtil.getColumnName(field.getName())) == null) {
                         field.set(obj, 0);
                      } else {
@@ -6462,7 +6484,7 @@ public class Manager implements IManager {
    
    @Override
    public <T extends Model> QuerySet<T> page(QueryPageNumber pageNumber, QueryPageSize pageSize, QueryPageOrder pageOrder,
-      String... filters) {
+         String... filters) {
       QuerySet<T> qs = null;
       pageNumber = pageNumber == null ? new QueryPageNumber() : pageNumber;
       pageSize = pageSize == null ? new QueryPageSize() : pageSize;
@@ -6511,7 +6533,7 @@ public class Manager implements IManager {
    
    @Override
    public <T extends Model> QuerySet<T> reversePage(QueryPageStart pageStart, QueryPageSize pageSize, QueryPageOrder pageOrder,
-      String... filters) {
+         String... filters) {
       String field = pageOrder != null ? pageOrder.field() : "";
       if (!field.isEmpty() && !field.startsWith("-")) {
          pageOrder.field("-" + field);
@@ -6571,7 +6593,7 @@ public class Manager implements IManager {
    
    @Override
    public <T extends Model> QuerySet<T> reversePage(QueryPageNumber pageNumber, QueryPageSize pageSize, QueryPageOrder pageOrder,
-      String... filters) {
+         String... filters) {
       String field = pageOrder != null ? pageOrder.field() : "";
       if (!field.isEmpty() && !field.startsWith("-")) {
          pageOrder.field("-" + field);
@@ -6848,6 +6870,226 @@ public class Manager implements IManager {
    
    public <T extends Model> List<T> distinctRandom(int size) {
       return getDistinctRandom(size);
+   }
+   
+   public <T extends Model> T id(int id) {
+      T model = null;
+      if (id > 0) {
+         model = this.get("id", id);
+      } else {
+         exceptionMessage = "ATENÇÃO: O id deve ser um número inteiro maior que zero!";
+         throw new IllegalStateException(exceptionMessage);
+      }
+      return model;
+   }
+   
+   private <T extends Model> QuerySet<T> find(String field, Object value, Class<T> modelClass) {
+      QuerySet<T> models = (QuerySet<T>) EMPTY_QUERYSET;
+      T model = null;
+      String columnName = "";
+      Object o = null;
+      PreparedStatement statement = null;
+      ResultSet resultSet = null;
+      OneToOneField oneToOneFieldAnnotation = null;
+      ForeignKeyField foreignKeyFieldAnnotation = null;
+      ManyToManyField manyToManyFieldAnnotation = null;
+      field = field == null ? "" : field.trim();
+      if (!field.isEmpty()) {
+         try {
+            field = TableUtil.getColumnName(field);
+            String sql = "SELECT * FROM";
+            if (value != null) {
+               sql = String.format("%s %s WHERE %s = '%s'", sql, tableName, field, value.toString());
+            } else {
+               if (field.equals("id")) {
+                  return null;
+               }
+               sql = String.format("%s %s WHERE %s IS NULL", sql, tableName, field);
+            }
+            if (Integer.class.isInstance(value) || Float.class.isInstance(value) || Double.class.isInstance(value)) {
+               sql = sql.replaceAll("\'", "");
+            }
+            connect();
+            statement = connection.prepareStatement(sql);
+            if (JediEngine.DEBUG) {
+               System.out.println(sql + ";\n");
+            }
+            resultSet = statement.executeQuery();
+            int rowCount = resultSet.last() ? resultSet.getRow() : 0;
+            if (rowCount > 0) {
+               models = new QuerySet<T>();
+            }
+            resultSet.beforeFirst();
+            while (resultSet.next()) {
+               model = (T) entity.newInstance();
+               if (resultSet.getObject("id") != null) {
+                  Field id = jedi.db.models.Model.class.getDeclaredField("id");
+                  id.setAccessible(true);
+                  o = resultSet.getObject(id.getName());
+                  if (connection.toString().startsWith("oracle")) {
+                     id.set(model, ((java.math.BigDecimal) o).intValue());
+                  } else {
+                     id.set(model, o);
+                  }
+               }
+               List<Field> _fields = JediEngine.getAllFields(this.entity);
+               for (Field f : _fields) {
+                  f.setAccessible(true);
+                  if (!JediEngine.isJediField(f)) {
+                     continue;
+                  }
+                  if (f.getName().equals("serialVersionUID"))
+                     continue;
+                  if (f.getName().equalsIgnoreCase("objects"))
+                     continue;
+                  oneToOneFieldAnnotation = f.getAnnotation(OneToOneField.class);
+                  foreignKeyFieldAnnotation = f.getAnnotation(ForeignKeyField.class);
+                  manyToManyFieldAnnotation = f.getAnnotation(ManyToManyField.class);
+                  FetchType fetchType = JediEngine.FETCH_TYPE;
+                  Manager manager = null;
+                  String referencedModel = null;
+                  String referencedTable = null;
+                  if (manyToManyFieldAnnotation != null) {
+                     fetchType = fetchType.equals(FetchType.NONE) ? manyToManyFieldAnnotation.fetch_type() : fetchType;
+                     if (fetchType.equals(FetchType.EAGER)) {
+                        if (!manyToManyFieldAnnotation.through().getSimpleName().equals(Model.class.getSimpleName())) {
+                           continue;
+                        }
+                        Class superClazz = null;
+                        Class clazz = null;
+                        referencedModel = manyToManyFieldAnnotation.model().getSimpleName();
+                        referencedModel = Model.class.getSimpleName().equals(referencedModel) ? "" : referencedModel;
+                        if (referencedModel.isEmpty()) {
+                           ParameterizedType genericType = null;
+                           if (ParameterizedType.class.isAssignableFrom(f.getGenericType().getClass())) {
+                              genericType = (ParameterizedType) f.getGenericType();
+                              superClazz = ((Class) (genericType.getActualTypeArguments()[0])).getSuperclass();
+                              if (superClazz == Model.class) {
+                                 clazz = (Class) genericType.getActualTypeArguments()[0];
+                                 referencedModel = clazz.getSimpleName();
+                              }
+                           }
+                        }
+                        referencedTable = manyToManyFieldAnnotation.references();
+                        if (referencedTable == null || referencedTable.trim().isEmpty()) {
+                           if (clazz != null) {
+                              referencedTable = TableUtil.getTableName(clazz);
+                           } else {
+                              referencedTable = TableUtil.getTableName(referencedModel);
+                           }
+                        }
+                        String packageName = this.entity.getPackage().getName();
+                        Class associatedModelClass = Class.forName(String.format("%s.%s", packageName, referencedModel));
+                        manager = new Manager(associatedModelClass);
+                        QuerySet associatedModelsQuerySet = manager.raw(
+                           String.format(
+                              "SELECT * FROM %s WHERE id IN (SELECT %s_id FROM %s_%s WHERE %s_id = %d)",
+                              referencedTable,
+                              referencedModel.toLowerCase(),
+                              tableName,
+                              referencedTable,
+                              TableUtil.getColumnName(model.getClass()),
+                              model.getId()
+                           ),
+                           associatedModelClass
+                        );
+                        f.set(model, associatedModelsQuerySet);
+                     } else {
+                        f.set(model, null);
+                     }
+                  } else if (foreignKeyFieldAnnotation != null) {
+                     fetchType = fetchType.equals(FetchType.NONE) ? foreignKeyFieldAnnotation.fetch_type() : fetchType;
+                     if (fetchType.equals(FetchType.EAGER)) {
+                        Class associatedModelClass = Class.forName(f.getType().getName());
+                        manager = new Manager(associatedModelClass);
+                        Model associatedModel = manager.get("id", resultSet.getObject(String.format("%s_id", TableUtil.getColumnName(f))));
+                        f.set(model, associatedModel);
+                     } else {
+                        f.set(model, null);
+                     }
+                  } else if (oneToOneFieldAnnotation != null) {
+                     fetchType = fetchType.equals(FetchType.NONE) ? oneToOneFieldAnnotation.fetch_type() : fetchType;
+                     if (fetchType.equals(FetchType.EAGER)) {
+                        Class associatedModelClass = Class.forName(f.getType().getName());
+                        manager = new Manager(associatedModelClass);
+                        columnName = TableUtil.getColumnName(f.getType().getSimpleName());
+                        o = resultSet.getObject(String.format("%s_id", columnName));
+                        Model associatedModel = manager.get("id", o);
+                        f.set(model, associatedModel);
+                     } else {
+                        f.set(model, null);
+                     }
+                  } else {
+                     if ((f.getType().getSimpleName().equals("int") || 
+                          f.getType().getSimpleName().equals("Integer")) && 
+                          connection.toString().startsWith("oracle")) {
+                        columnName = TableUtil.getColumnName(f.getName());
+                        o = resultSet.getObject(columnName);
+                        if (o == null) {
+                           f.set(model, 0);
+                        } else {
+                           columnName = TableUtil.getColumnName(f.getName());
+                           o = resultSet.getObject(columnName);
+                           f.set(model, ((BigDecimal) o).intValue());
+                        }
+                     } else {
+                        columnName = TableUtil.getColumnName(f.getName());
+                        o = resultSet.getObject(columnName);
+                        if (o instanceof java.sql.Date) {
+                           java.sql.Date date = (java.sql.Date) o;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(date.getTime());
+                           calendar.set(Calendar.HOUR_OF_DAY, 0);
+                           calendar.set(Calendar.MINUTE, 0);
+                           calendar.set(Calendar.SECOND, 0);
+                           o = calendar.getTime();
+                        }
+                        if (o instanceof java.sql.Time) {
+                           java.sql.Time time = (java.sql.Time) o;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(time.getTime());
+                           calendar.set(Calendar.YEAR, 0);
+                           calendar.set(Calendar.MONTH, 0);
+                           calendar.set(Calendar.DAY_OF_MONTH, 0);
+                           o = calendar.getTime();
+                        }
+                        if (o instanceof Timestamp) {
+                           Timestamp timestamp = (Timestamp) o;
+                           Calendar calendar = Calendar.getInstance();
+                           calendar.setTimeInMillis(timestamp.getTime());
+                           o = calendar.getTime();
+                        }
+                        f.set(model, o);
+                     }
+                  }
+                  manager = null;
+               }
+               models.add(model);
+            }
+            if (model != null) {
+               model.setPersisted(true);
+            }
+         } catch (SQLException e) {
+            e.printStackTrace();
+         } catch (InstantiationException e) {
+            e.printStackTrace();
+         } catch (IllegalAccessException e) {
+            e.printStackTrace();
+         } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+         } catch (SecurityException e) {
+            e.printStackTrace();
+         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+         } finally {
+            close(resultSet, statement, connection);
+         }
+      }
+      return models;
+   }
+   
+   public <T extends Model> QuerySet<T> find(String field, Object value) {
+      return (QuerySet<T>) find(field, value, this.entity);
    }
    
    // QuerySet API Reference
