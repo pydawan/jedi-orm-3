@@ -2164,6 +2164,18 @@ public class Manager implements IManager {
       return this;
    }
    
+   @Override
+   public IManager save(List<Model> models) {
+      if (models != null) {
+         for (Model model : models) {
+            if (model != null) {
+               model.save();
+            }
+         }
+      }
+      return this;
+   }
+   
    public <T extends Model> T getOrCreate(String... args) {
       T obj = null;
       try {

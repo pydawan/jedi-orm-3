@@ -25,6 +25,8 @@ public interface IManager {
    
    IManager save(Model... models);
    
+   IManager save(List<Model> models);
+   
    void using(String database);
    
    boolean getAutoCloseConnection();
