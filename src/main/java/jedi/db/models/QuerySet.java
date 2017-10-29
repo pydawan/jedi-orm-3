@@ -1049,5 +1049,21 @@ public class QuerySet<T extends Model> extends ArrayList<T> {
       System.out.println();
    }
    
+   public boolean isEmpty() {
+      return super.isEmpty();
+   }
+   
+   public boolean isNotEmpty() {
+      return !super.isEmpty();
+   }
+   
+   public boolean empty() {
+      return isEmpty();
+   }
+   
+   public boolean notEmpty() {
+      return isNotEmpty();
+   }
+   
    // TODO - Implementar o método query() que irá retornar a instrução SQL correspondente a QuerySet.
 }
