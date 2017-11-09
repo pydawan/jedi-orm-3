@@ -805,17 +805,29 @@ public class Model implements IModel {
    }
    
    public void save() throws DatabaseException {
+      this.onPreSave();
       if (!persisted()) {
          this.insert();
       } else {
          this.update();
       }
       persisted = true;
+      this.onPostSave();
    }
    
    public <T extends Model> T save(Class<T> modelClass) throws DatabaseException {
       this.save();
       return this.as(modelClass);
+   }
+   
+   @Override
+   public void onPreSave() {
+      
+   }
+   
+   @Override
+   public void onPostSave() {
+      
    }
    
    public void delete() throws DatabaseException {

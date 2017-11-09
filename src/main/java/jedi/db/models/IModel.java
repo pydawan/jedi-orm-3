@@ -76,4 +76,8 @@ public interface IModel extends Comparable<Model>, Serializable {
    
    public <T extends Model> T as(Class<T> c);
    
+   public void onPreSave();
+   
+   public void onPostSave();
+   
 }
