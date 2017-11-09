@@ -37,10 +37,10 @@ public class Model implements IModel {
 
    private static final long serialVersionUID = 1L;
    
-   public static final List<?> NULL_LIST = null;
+   public static final List<? extends Model> NULL_LIST = null;
    public static final QuerySet<? extends Model> NULL_QUERYSET = null;
    
-   public static final List<?> EMPTY_LIST = new ArrayList<>(0);
+   public static final List<? extends Model> EMPTY_LIST = new ArrayList<>(0);
    public static final QuerySet<? extends Model> EMPTY_QUERYSET = new QuerySet<>(0);
    
    private transient Connection connection;
@@ -940,10 +940,15 @@ public class Model implements IModel {
       return u;
    }
    
-   public String toString() {
+   public String str() {
       Class<? extends Model> c = this.getClass();
       String clazz = c.getSimpleName();
       return String.format("<%s: %s>", clazz, this.unicode());
+   }
+   
+   @Override
+   public String toString() {
+      return String.format("%s(id=%s, persisted=%s)", this.getClass().getSimpleName(), this.id, this.persisted);
    }
    
    /**
