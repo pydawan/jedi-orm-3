@@ -273,8 +273,9 @@ public class Model implements IModel {
                } else {
                   if (annotationClass == DateField.class) {
                      if (defaultValue.isEmpty()) {
+                        DateField dateField = (DateField) annotation;
                         // Atribui a data atual ao inserir ou atualizar.
-                        if (((DateField) annotation).auto_now_add()) {
+                        if (dateField.auto_now_add()) {
                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                            values += String.format("'%s', ", sdf.format(new Date()));
                         } else {
@@ -286,7 +287,8 @@ public class Model implements IModel {
                      }
                   } else if (annotationClass == TimeField.class) {
                      if (defaultValue.isEmpty()) {
-                        if (((TimeField) annotation).auto_now_add()) {
+                        TimeField timeField = (TimeField) annotation;
+                        if (timeField.auto_now_add()) {
                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                            values += String.format("'%s', ", sdf.format(new Date()));
                         } else {
@@ -297,8 +299,9 @@ public class Model implements IModel {
                      }
                   } else if (annotationClass == DateTimeField.class) {
                      if (defaultValue.isEmpty()) {
-                        if (((DateTimeField) annotation).auto_now_add()) {
-                           int precision = ((DateTimeField) annotation).precision();
+                        DateTimeField datetimeField = (DateTimeField) annotation;
+                        if (datetimeField.required() && !datetimeField.auto_now_add()) {
+                           int precision = datetimeField.precision();
                            SimpleDateFormat sdf = null;
                            switch (precision) {
                               case 1:
@@ -679,7 +682,7 @@ public class Model implements IModel {
                      } else if (dateTimeFieldAnnotation != null) {
                         defaultValue = JediEngine.getDefaultValue(dateTimeFieldAnnotation);
                         if (defaultValue.isEmpty()) {
-                           if (dateTimeFieldAnnotation.auto_now()) {
+                           if (dateTimeFieldAnnotation.required() && !dateTimeFieldAnnotation.auto_now()) {
                               int precision = dateTimeFieldAnnotation.precision();
                               SimpleDateFormat sdf = null;
                               switch (precision) {
@@ -718,7 +721,6 @@ public class Model implements IModel {
                   }
                } else {
                   if (oneToOneFieldAnnotation != null || foreignKeyFieldAnnotation != null) {
-//                     Object id = ((Model) field.get(this)).id;
                      Model model = (Model) field.get(this);
                      Object id = model == null ? null : model.id();
                      fieldsAndValues += String.format("%s, ", id);
@@ -827,6 +829,36 @@ public class Model implements IModel {
    
    @Override
    public void onPostSave() {
+      
+   }
+   
+   @Override
+   public void onPreInsert() {
+      
+   }
+   
+   @Override
+   public void onPostInsert() {
+      
+   }
+   
+   @Override
+   public void onPreUpdate() {
+      
+   }
+   
+   @Override
+   public void onPostUpdate() {
+      
+   }
+   
+   @Override
+   public void onPreDelete() {
+      
+   }
+   
+   @Override
+   public void onPostDelete() {
       
    }
    

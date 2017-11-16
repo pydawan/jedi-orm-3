@@ -104,4 +104,12 @@ public interface IQuerySet<T extends Model> {
    
    public QuerySet<T> slice(String slice);
    
+   public QuerySet<T> asc(String field);
+   
+   public QuerySet<T> asc();
+   
+   public QuerySet<T> desc(String field);
+   
+   public QuerySet<T> desc();
+   
 }

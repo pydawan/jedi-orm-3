@@ -80,4 +80,16 @@ public interface IModel extends Comparable<Model>, Serializable {
    
    public void onPostSave();
    
+   public void onPreInsert();
+   
+   public void onPostInsert();
+   
+   public void onPreUpdate();
+   
+   public void onPostUpdate();
+   
+   public void onPreDelete();
+   
+   public void onPostDelete();
+   
 }
