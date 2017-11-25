@@ -37,6 +37,8 @@ public class Model implements IModel {
 
    private static final long serialVersionUID = 1L;
    
+   private static Class<? extends Model> clazz_;
+   
    public static final List<? extends Model> NULL_LIST = null;
    public static final QuerySet<? extends Model> NULL_QUERYSET = null;
    
@@ -52,6 +54,7 @@ public class Model implements IModel {
    
    public Model() {
       this.setTableName(TableUtil.tableName(this.getClass()));
+      clazz_ = this.getClass();
    }
    
    public boolean getAutoCloseConnection() {
@@ -153,6 +156,22 @@ public class Model implements IModel {
       return this;
    }
    
+   private static <T extends Model> ArrayList<T> list(Class<T> clazz) {
+      return new ArrayList<T>();
+   }
+   
+   public static <T extends Model> ArrayList<T> list() {
+      return (ArrayList<T>) list(clazz_);
+   }
+   
+   private static <T extends Model> QuerySet<T> queryset(Class<T> clazz) {
+      return new QuerySet<T>();
+   }
+   
+   public static <T extends Model> QuerySet<T> queryset() {
+      return (QuerySet<T>) queryset(clazz_);
+   }
+   
    /**
     * Método que insere o modelo invocador na tabela apropriada
     * no banco de dados.
@@ -226,6 +245,7 @@ public class Model implements IModel {
                field.getType().toString().endsWith("DateTime")) {
                Date date = (Date) field.get(this);
                if (date != null) {
+                  // Valor da data informado.
                   Calendar calendar = Calendar.getInstance();
                   calendar.setTime(date);
                   if (annotationClass == DateField.class) {
@@ -271,66 +291,23 @@ public class Model implements IModel {
                   
                   }
                } else {
+                  // Valor da data não informado.
                   if (annotationClass == DateField.class) {
-                     if (defaultValue.isEmpty()) {
-                        DateField dateField = (DateField) annotation;
-                        // Atribui a data atual ao inserir ou atualizar.
-                        if (dateField.auto_now_add()) {
-                           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                           values += String.format("'%s', ", sdf.format(new Date()));
-                        } else {
-                           // Remove coluna da instrução SQL.
-                           columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
-                        }
-                     } else {
-                        values += String.format(defaultValue.equalsIgnoreCase("NULL") ? "%s, " : "'%s', ", defaultValue);
+                     DateField dateField = (DateField) annotation;
+                     // 1 - Coluna com preenchimento automático ou valor padrão definidos no banco de dados?
+                     if (dateField.auto_now_add() == true || defaultValue.isEmpty() == false) {
+                        // 1.1 - Remove coluna da instrução SQL.
+                        columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                      }
                   } else if (annotationClass == TimeField.class) {
-                     if (defaultValue.isEmpty()) {
-                        TimeField timeField = (TimeField) annotation;
-                        if (timeField.auto_now_add()) {
-                           SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                           values += String.format("'%s', ", sdf.format(new Date()));
-                        } else {
-                           columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
-                        }
-                     } else {
-                        values += String.format(defaultValue.equalsIgnoreCase("NULL") ? "%s, " : "'%s', ", defaultValue);
+                     TimeField timeField = (TimeField) annotation;
+                     if (timeField.auto_now_add() == true || defaultValue.isEmpty() == false) {
+                        columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                      }
                   } else if (annotationClass == DateTimeField.class) {
-                     if (defaultValue.isEmpty()) {
-                        DateTimeField datetimeField = (DateTimeField) annotation;
-                        if (datetimeField.required() && !datetimeField.auto_now_add()) {
-                           int precision = datetimeField.precision();
-                           SimpleDateFormat sdf = null;
-                           switch (precision) {
-                              case 1:
-                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-                                 break;
-                              case 2:
-                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
-                                 break;
-                              case 3:
-                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                                 break;
-                              case 4:
-                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS");
-                                 break;
-                              case 5:
-                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSS");
-                                 break;
-                              case 6:
-                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
-                                 break;
-                              default:
-                                 sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                           }
-                           values += String.format("'%s', ", sdf.format(new Date()));
-                        } else {
-                           columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
-                        }
-                     } else {
-                        values += String.format(defaultValue.equalsIgnoreCase("NULL") ? "%s, " : "'%s', ", defaultValue);
+                     DateTimeField datetimeField = (DateTimeField) annotation;
+                     if (datetimeField.auto_now_add() == true || defaultValue.isEmpty() == false) {
+                        columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                      }
                   } else {
                      values += String.format("'', ", field.get(this));
@@ -435,8 +412,8 @@ public class Model implements IModel {
                }
             }
          }
-         columns = columns.substring(0, columns.lastIndexOf(','));
-         values = values.substring(0, values.lastIndexOf(','));
+         columns = columns.contains(",") ? columns.substring(0, columns.lastIndexOf(',')) : columns;
+         values = values.contains(",") ? values.substring(0, values.lastIndexOf(',')) : values;
          sql = String.format("%s %s (%s) VALUES (%s);", sql, tableName, columns, values);
          if (JediEngine.DEBUG) {
             System.out.println(sql + "\n");
@@ -558,7 +535,9 @@ public class Model implements IModel {
                                           TableUtil.getColumnName(this.getClass()),
                                           TableUtil.getColumnName(referencedModel),
                                           this.id,
-                                          id));
+                                          id
+                                       )
+                                    );
                                  } else {
                                     manyToManySQLs.add(
                                        String.format(
@@ -570,7 +549,9 @@ public class Model implements IModel {
                                           TableUtil.getColumnName(this.getClass()),
                                           this.id,
                                           TableUtil.getColumnName(referencedModel),
-                                          id));
+                                          id
+                                       )
+                                    );
                                  }
                               }
                            }
@@ -608,6 +589,7 @@ public class Model implements IModel {
                   field.getType().toString().endsWith("DateTime")) {
                   Date date = (Date) field.get(this);
                   if (date != null) {
+                     // Valor da data informado.
                      Calendar calendar = Calendar.getInstance();
                      calendar.setTime(date);
                      if (dateFieldAnnotation != null) {
@@ -653,67 +635,26 @@ public class Model implements IModel {
                      
                      }
                   } else {
+                     // Valor da data não informado.
                      if (dateFieldAnnotation != null) {
                         defaultValue = JediEngine.getDefaultValue(dateFieldAnnotation);
-                        if (defaultValue.isEmpty()) {
-                           if (dateFieldAnnotation.auto_now()) {
-                              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                              fieldsAndValues += String.format("'%s', ", sdf.format(new Date()));
-                           } else {
-                              fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
-                              fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
-                           }
-                        } else {
-                           fieldsAndValues += String.format(defaultValue.equalsIgnoreCase("NULL") ? "%s, " : "'%s', ", defaultValue);
+                        // 1 - Coluna com preenchimento automático ou valor padrão definidos no banco de dados?
+                        if (dateFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
+                           // 1.1 - Remove coluna e valor da instrução SQL.
+                           fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
+                           fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
                         }
                      } else if (timeFieldAnnotation != null) {
                         defaultValue = JediEngine.getDefaultValue(timeFieldAnnotation);
-                        if (defaultValue.isEmpty()) {
-                           if (timeFieldAnnotation.auto_now()) {
-                              SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                              fieldsAndValues += String.format("'%s', ", sdf.format(new Date()));
-                           } else {
-                              fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
-                              fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
-                           }
-                        } else {
-                           fieldsAndValues += String.format(defaultValue.equalsIgnoreCase("NULL") ? "%s, " : "'%s', ", defaultValue);
+                        if (timeFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
+                           fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
+                           fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
                         }
                      } else if (dateTimeFieldAnnotation != null) {
                         defaultValue = JediEngine.getDefaultValue(dateTimeFieldAnnotation);
-                        if (defaultValue.isEmpty()) {
-                           if (dateTimeFieldAnnotation.required() && !dateTimeFieldAnnotation.auto_now()) {
-                              int precision = dateTimeFieldAnnotation.precision();
-                              SimpleDateFormat sdf = null;
-                              switch (precision) {
-                                 case 1:
-                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-                                    break;
-                                 case 2:
-                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
-                                    break;
-                                 case 3:
-                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                                    break;
-                                 case 4:
-                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSS");
-                                    break;
-                                 case 5:
-                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSS");
-                                    break;
-                                 case 6:
-                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
-                                    break;
-                                 default:
-                                    sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                              }
-                              fieldsAndValues += String.format("'%s', ", sdf.format(new Date()));
-                           } else {
-                              fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
-                              fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
-                           }
-                        } else {
-                           fieldsAndValues += String.format(defaultValue.equalsIgnoreCase("NULL") ? "%s, " : "'%s', ", defaultValue);
+                        if (dateTimeFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
+                           fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
+                           fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
                         }
                      } else {
                         fieldsAndValues += String.format("'', ", field.get(this));

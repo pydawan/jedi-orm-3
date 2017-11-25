@@ -2413,7 +2413,8 @@ public abstract class JediEngine {
                getSQLFormatter(dateFieldAnnotation, DATABASE_ENGINE),
                fieldName,
                dateFieldAnnotation.required() ? " NOT NULL" : "",
-               defaultValue.isEmpty() ? defaultValue : String.format(" DEFAULT '%s'", defaultValue),
+               defaultValue.isEmpty() ? defaultValue : String.format(defaultValue.equalsIgnoreCase("NULL") ? 
+               " DEFAULT %s" : " DEFAULT '%s'", defaultValue),
                dateFieldAnnotation.unique() ? " UNIQUE" : "",
                DATABASE_ENGINE.equals("mysql") && !comment.isEmpty() ? String.format(" COMMENT '%s'", comment) : "");
             if (MYSQL_VERSION != null) {
