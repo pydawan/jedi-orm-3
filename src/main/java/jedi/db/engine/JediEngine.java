@@ -2454,7 +2454,8 @@ public abstract class JediEngine {
                getSQLFormatter(timeFieldAnnotation, DATABASE_ENGINE),
                fieldName,
                timeFieldAnnotation.required() ? " NOT NULL" : "",
-               defaultValue.isEmpty() ? defaultValue : String.format(" DEFAULT '%s'", defaultValue),
+               defaultValue.isEmpty() ? defaultValue : String.format(defaultValue.equalsIgnoreCase("NULL") ? 
+               " DEFAULT %s" : " DEFAULT '%s'", defaultValue),
                timeFieldAnnotation.unique() ? " UNIQUE" : "",
                DATABASE_ENGINE.equals("mysql") && !comment.isEmpty() ? String.format(" COMMENT '%s'", comment) : "");
             if (MYSQL_VERSION != null) {
@@ -2548,7 +2549,8 @@ public abstract class JediEngine {
             String formatter = getSQLFormatter(annotation, DATABASE_ENGINE);
             String notNull = annotation.required() ? " NOT NULL" : "";
             String unique = annotation.unique() ? " UNIQUE" : "";
-            String _default = defaultValue.isEmpty() ? "" : String.format(" DEFAULT '%s'", defaultValue);
+            String _default = defaultValue.isEmpty() ? defaultValue : String.format(defaultValue.equalsIgnoreCase("NULL") ? 
+            " DEFAULT %s" : " DEFAULT '%s'", defaultValue);
             int precision = getPrecision(annotation);
             // TODO - essa tratativa deve ficar no método getComment().
             if (DATABASE_ENGINE.equals("mysql")) {
