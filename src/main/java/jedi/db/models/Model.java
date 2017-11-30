@@ -295,18 +295,18 @@ public class Model implements IModel {
                   if (annotationClass == DateField.class) {
                      DateField dateField = (DateField) annotation;
                      // 1 - Coluna com preenchimento automático ou valor padrão definidos no banco de dados?
-                     if (dateField.auto_now_add() == true || defaultValue.isEmpty() == false) {
+                     if (dateField.auto_now_add() == true || dateField.auto_now() == true || defaultValue.isEmpty() == false) {
                         // 1.1 - Remove coluna da instrução SQL.
                         columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                      }
                   } else if (annotationClass == TimeField.class) {
                      TimeField timeField = (TimeField) annotation;
-                     if (timeField.auto_now_add() == true || defaultValue.isEmpty() == false) {
+                     if (timeField.auto_now_add() == true || timeField.auto_now() == true || defaultValue.isEmpty() == false) {
                         columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                      }
                   } else if (annotationClass == DateTimeField.class) {
                      DateTimeField datetimeField = (DateTimeField) annotation;
-                     if (datetimeField.auto_now_add() == true || defaultValue.isEmpty() == false) {
+                     if (datetimeField.auto_now_add() == true || datetimeField.auto_now() == true || defaultValue.isEmpty() == false) {
                         columns = columns.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                      }
                   } else {
@@ -639,20 +639,20 @@ public class Model implements IModel {
                      if (dateFieldAnnotation != null) {
                         defaultValue = JediEngine.getDefaultValue(dateFieldAnnotation);
                         // 1 - Coluna com preenchimento automático ou valor padrão definidos no banco de dados?
-                        if (dateFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
+                        if (dateFieldAnnotation.auto_now_add() == true || dateFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
                            // 1.1 - Remove coluna e valor da instrução SQL.
                            fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                            fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
                         }
                      } else if (timeFieldAnnotation != null) {
                         defaultValue = JediEngine.getDefaultValue(timeFieldAnnotation);
-                        if (timeFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
+                        if (timeFieldAnnotation.auto_now_add() == true || timeFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
                            fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                            fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
                         }
                      } else if (dateTimeFieldAnnotation != null) {
                         defaultValue = JediEngine.getDefaultValue(dateTimeFieldAnnotation);
-                        if (dateTimeFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
+                        if (dateTimeFieldAnnotation.auto_now_add() == true || dateTimeFieldAnnotation.auto_now() == true || defaultValue.isEmpty() == false) {
                            fieldsAndValues = fieldsAndValues.replace(String.format("%s, ", TableUtil.getColumnName(field)), "");
                            fieldsAndValues = fieldsAndValues.replace(String.format("%s =", TableUtil.getColumnName(field)), "");
                         }
