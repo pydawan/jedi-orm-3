@@ -63,6 +63,8 @@ public interface IManager {
    
    <T extends Model> QuerySet<T> filter(String... fieldsLookups);
    
+   <T extends Model> QuerySet<T> filter(String query);
+   
    <T extends Model> QuerySet<T> _exclude(String... fields);
    
    <T extends Model> QuerySet<T> where(String criteria, Object... values);

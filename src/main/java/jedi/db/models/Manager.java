@@ -4306,22 +4306,13 @@ public class Manager implements IManager {
       return (QuerySet<T>) this.filter(this.entity, (String[]) fields);
    }
 
-   // User.objects.filter("username__startswith='Thiago' and idade__exact=30");
-   // TODO 1 - String query = "username__startswith='Thiago' and idade >= 30";
-   // TODO 2 - query = query.replaceAll("( >= )", "__gt=");
-   // TODO 3 - String[] fields = query.split(" ");
-   // TODO 4 - this.filter(this.entity, (String[]) fields);
-   // ou pegar a string query e transformar diretamente para SQL com replace.
    public <T extends Model> QuerySet<T> filter(String query) {
       QuerySet<T> list = (QuerySet<T>) EMPTY_QUERYSET;
       query = query == null ? "" : query.trim();
       if (query.isEmpty() == false) {
-         query = query.replaceAll("(<| < )", "__lt=");
-         query = query.replaceAll("(<=| <= )", "__lte=");
-         query = query.replaceAll("(=| = )", "__exact=");
-         query = query.replaceAll("(>=| >= )", "__gte=");
-         query = query.replaceAll("(>| > )", "__gt=");
-         String[] fields = query.split(" ");
+         query = query.replaceAll(",\\s+", ",");
+         query = query.replaceAll("\\s+=\\s+", "=");
+         String[] fields = query.split("((?<!')((?<= and)|(?=and ))(?!'))|((?<!')((?<= or)|(?=or ))(?!'))");
          list = (QuerySet<T>) this.filter(this.entity, (String[]) fields);
       }
       return list;
